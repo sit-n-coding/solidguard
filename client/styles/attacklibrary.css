@@ -1,0 +1,40 @@
+.AttackPageContainer {
+    background-color: #003748;
+    height: 100vh
+   
+}
+
+.AttackLandingRowContainer {
+    background-color: yellow;
+    height: 200px;
+}
+
+.ContributeButton {
+    background-color: black;
+    border-radius: 40px;
+    height: 60px;
+    width: 200px;
+    margin-bottom: 20px;
+}
+
+.LandingImageContainer {
+    height: 200px;
+   
+}
+
+#AttackLandingText {
+    margin-left: 40px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-size: 30px
+}
+
+#AttackLandingSubtext {
+    margin-left: 40px;
+    margin-bottom: 64px;
+}
+
+#AttackControbuteText {
+    margin: 30px;
+    font-size: 20px;
+}

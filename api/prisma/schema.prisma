@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  email     String   @unique
+  password  String
+  role      Role
+}
+
+model Exploit {
+  id           String   @id @default(cuid())
+  createdAt    DateTime @default(now())
+  name         String   @unique
+  author       String
+  description  String
+  script       String
+  targetAuthor String
+  targetRepo   String
+  targetPath   String
+  targetRef    String
+  verify       Boolean  @default(false)
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+model Contract {
+  addr      String      @id
+  pause     Boolean     @default(false)
+  createdAt DateTime    @default(now())
+  Subscribe Subscribe[]
+}
+
+model Subscribe {
+  createdAt    DateTime @default(now())
+  emailAddr    String
+  contractAddr String
+  contract     Contract @relation(fields: [contractAddr], references: [addr])
+
+  @@id([emailAddr, contractAddr])
+}

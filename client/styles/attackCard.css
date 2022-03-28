@@ -1,0 +1,174 @@
+.AttackCardContainer {
+    display: flex;
+    flex-direction: column;
+    width: 45vw;
+    height: 20vh;
+    margin: 20px;   
+    border-radius: 0 15px 15px 15px; /* This is a short hand syntax */
+    box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
+    transition: all .2s ease-in-out; 
+}
+
+.AttackCardContainer:hover { 
+    transform: scale(1.04); 
+}
+
+.AttackCardTopRow {
+    display: flex;
+    flex-direction: row;
+    height: 35%;
+}
+
+.AttackCardTopRow div {
+    width: 100%;
+    border-radius: 0 15px 0 0;
+    display:flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.AttackCardTopRowItem {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.AttackCardBottomRow {
+    display: flex;
+    flex-direction: row;
+    height: 65%;    
+}
+
+.AttackCardDescriptionContainer {
+    width: calc(200%/ 3);   
+    height: 100%;
+    overflow: hidden;
+    white-space: wrap;    
+}
+
+.AttackCardDescription {
+    margin-left: 30px;
+    margin-top: 10px;   
+}
+.AttackCardButtonContainer {
+    width: 40%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+
+}
+
+.AttackCardButton {
+    margin: 20px;
+    width: 60%; 
+}
+
+.ModalHeader {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-left: 45px;
+    margin-right: 45px;
+}
+
+.CodeButtonsContainer {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.CodePreview {
+    height: 68%;
+    width: 120vh;
+    border-radius: 10px;
+}
+
+.CodeUploads {
+    height: 90%;
+    width: 80vh;
+    border-radius: 10px;
+}
+
+.VerifiedContainer {
+    display: flex;
+    flex-direction: column;
+}
+
+.ProcessingContainer {
+    display: flex;
+    flex-direction: column;
+}
+
+.TitleRow {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.SubtitleRow {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    margin-right: 40px;
+}
+
+.Tags {
+    width: 400px;
+    height: 60px;
+    margin-top: 24px;
+    margin-left: 24px;
+}
+
+.ProcessingButtonList {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    background-color: "black";
+    margin-top: 10px;
+    margin-right: 20px;
+    width: 400px;
+    height: 70px;
+}
+
+.CloseButton {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.UnapproveButton {
+    background-color: #FF6060;
+    border-radius: 10px;
+    height: 40px;
+    width: 110px;
+}
+
+.HoldButton {
+    background-color: #D8E1FF;
+    border-radius: 10px;
+    height: 40px;
+    width: 120px;
+}
+
+.AcceptButton {
+    background-color: #95EE9E;
+    border-radius: 10px;
+    height: 40px;
+    width: 120px;
+}
+
+.LeftRightButtonContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 500px;
+}
+
+.LeftRightButton {
+    color: #000000;
+    height: 50px;
+    width: 40px;
+}

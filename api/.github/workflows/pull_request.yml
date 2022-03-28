@@ -1,0 +1,80 @@
+name: 'Pull Request'
+on: pull_request
+jobs:
+
+  LINT:
+    name: LINT
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with: 
+          node_version: '16.13.0'
+
+      - name: Install ESLint
+        run: npm i @typescript-eslint/eslint-plugin @typescript-eslint/parser eslint eslint-config-prettier eslint-plugin-prettier eslint-plugin-simple-import-sort
+      
+      - name: Check for linting
+        run: npm run lint:check
+
+  FORMAT:
+    name: FORMAT
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with: 
+          node_version: '16.13.0'
+
+      - name: Install Prettier
+        run: npm i prettier
+
+      - name: Check formatting
+        run: npm run format:check
+
+  TEST:
+    name: TEST
+    runs-on: ubuntu-latest
+    container: node:16.13.0
+
+    services:
+      postgres:
+        image: postgres
+        env:
+            POSTGRES_USERNAME: postgres
+            POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+      
+      redis:
+        image: redis
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install
+        run: npm install
+    
+      - name: Migrate database
+        run: npm run migrate:dev
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@postgres:5432/
+
+      - name: Run automated tests
+        run: npm run test:ci
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@postgres:5432/
+          PROVIDER_URL: ${{ secrets.TEST_PROVIDER_URL }}
+          ETHERSCAN_API_KEY: ${{ secrets.TEST_ETHERSCAN_API_KEY }}
+          ETHERSCAN_URL: https://api-rinkeby.etherscan.io/
+          SGM_ADDRESS: '0x05BA813eA8d76b1553f68A1b5dC942e71846adD9'
+          DEPLOY_PRIVATE_KEY: ${{ secrets.TEST_DEPLOY_PRIVATE_KEY }}
+          JWT_ACCESS_SECRET: 'nestjsPrismaAccessSecret'
+          JWT_EXPIRES_TIME: '60s'

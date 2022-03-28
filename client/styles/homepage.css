@@ -1,0 +1,58 @@
+.HomepageContainer {
+    background-color: black;
+   
+}
+.LandingRowContainer {
+    background-color: yellow;
+    height: 210px;
+}
+
+#LandingText {
+    margin-left: 40px;
+    margin-top: 46px;
+    margin-bottom: 64px;
+}
+#LandingImage {
+    background-color: blue;
+}
+
+.HomepageBlockContainer {
+    position: relative;
+    height: 25vh;
+    display: flex;
+    flex-direction: row;
+}
+
+.HomepageTextBlock {
+    width: 50%;   
+    z-index: 1;
+}
+
+.HomepageButtonBlock {
+    width: 50%;   
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    z-index: 1;
+}
+
+.HomepageBlockText {
+    margin: 30px;
+}
+
+.HomepageButton {
+    margin-bottom: 30px;
+    margin-right: 30px;
+    width: 250px;
+    height: 60px;
+    border-radius: 10px;
+}
+
+.InstructionsBlockContainer {
+    position: relative;
+    height: 50vh;
+}
+
+.BannerImage {
+    z-index: 0;
+}
