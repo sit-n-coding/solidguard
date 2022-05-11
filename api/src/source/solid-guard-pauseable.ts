@@ -1,8 +1,9 @@
+// TODO: Use MPL-2.0 instead of MIT
 export const solidGuardPauseable = (sgmAddress: string) => `
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: MPL-2.0
 // Name: SolidGuardPauseable
 // GitHub: https://github.com/SolidGuard
-// Version: prototype-v1.0
+// Version: v1.0
 
 pragma solidity ^0.8.0;
 

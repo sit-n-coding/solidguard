@@ -7,9 +7,17 @@ import {
   IsString,
 } from 'class-validator';
 
+export class SubscribeDto {
+  emailAddr: string;
+  contractAddr: string;
+  userId: string;
+  createdAt: Date;
+}
+
 export class CreateSubscribeDto {
   emailAddrs: string[];
   contractAddrs: string[];
+  userId: string;
 }
 
 export class CreateSubscribeRequestDto {
@@ -32,7 +40,7 @@ export class CreateSubscribeRequestDto {
   contractAddrs: string[];
   @IsString()
   @ApiProperty({ example: '' })
-  @IsNotEmpty()
+  @IsNotEmpty() // O.K. since this does not go near the database.
   signedJSON: string;
 }
 
@@ -48,4 +56,11 @@ export class CreateSubscribeResponseDto {
     ],
   })
   contractAddrs: string[];
+}
+
+export class DashboardDto {
+  emailAddrs: string;
+  contractAddrs: string;
+  pauseable: boolean;
+  createAt: Date;
 }

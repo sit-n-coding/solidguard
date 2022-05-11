@@ -1,0 +1,127 @@
+name: 'Pull Request'
+on: pull_request
+jobs:
+
+  LINT_API:
+    name: LINT_API
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./api
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with: 
+          node_version: '14.0'
+
+      - name: Install ESLint
+        run: npm i @typescript-eslint/eslint-plugin @typescript-eslint/parser eslint eslint-config-prettier eslint-plugin-prettier eslint-plugin-simple-import-sort
+      
+      - name: Check for linting
+        run: npm run lint:check
+
+  FORMAT_API:
+    name: FORMAT_API
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./api
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with: 
+          node_version: '14.0'
+
+      - name: Install Prettier
+        run: npm i prettier
+
+      - name: Check formatting
+        run: npm run format:check
+
+  TEST_API:
+    name: TEST_API
+    runs-on: ubuntu-latest
+    container: node:14
+    defaults:
+      run:
+        working-directory: ./api
+
+    services:
+      postgres:
+        image: postgres
+        env:
+            POSTGRES_USERNAME: postgres
+            POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+      
+      redis:
+        image: redis
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: npm install
+    
+      - name: Migrate database
+        run: npm run migrate:dev
+        env:
+          POSTGRES_URL: postgresql://postgres:postgres@postgres:5432/
+
+      - name: Run automated tests
+        run: npm run test
+        env:
+          POSTGRES_URL: postgresql://postgres:postgres@postgres:5432/
+          PROVIDER_URL: ${{ secrets.TEST_PROVIDER_URL }}
+          ETHERSCAN_API_KEY: ${{ secrets.TEST_ETHERSCAN_API_KEY }}
+          ETHERSCAN_URL: https://api-rinkeby.etherscan.io/
+          SGM_ADDRESS: '0x05BA813eA8d76b1553f68A1b5dC942e71846adD9'
+          DEPLOY_PRIVATE_KEY: ${{ secrets.TEST_DEPLOY_PRIVATE_KEY }}
+
+  TEST_BLOCKCHAIN:
+    name: TEST_BLOCKCHAIN
+    runs-on: ubuntu-latest
+    container: node:14
+    defaults:
+      run:
+        working-directory: ./blockchain
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: npm install
+    
+      - name: Run automated tests
+        run: npm test
+
+  BUILD_CLIENT:
+    name: BUILD_CLIENT
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./client
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with: 
+          node_version: '14.0'
+
+      - name: Install all
+        run: npm i
+      
+      - name: Build frontend
+        run: npm run build

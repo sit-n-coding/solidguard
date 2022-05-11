@@ -1,6 +1,13 @@
-import { ExploitDto } from '../exploit/dto';
+import { ExploitResponseDto } from '../exploit/dto';
 
-export const emailHTML = (exploitDto: ExploitDto) => `
+export const emailHTML = (exploitDto: ExploitResponseDto) => {
+  let concatNames = '';
+  for (const targetName of exploitDto.targetNames) {
+    if (concatNames) concatNames = concatNames.concat(', ');
+    concatNames = concatNames.concat(targetName);
+  }
+
+  return `
 <p style="font-size: 14px; line-height: 140%;">
     Dear SolidGuard users,
     <br>
@@ -10,19 +17,17 @@ export const emailHTML = (exploitDto: ExploitDto) => `
     <strong>
         Name: ${exploitDto.name}
         <br>
-            Found by: ${exploitDto.author}
+            Found by: ${exploitDto.authorName}
         <br>
-            Affected Repository: ${exploitDto.targetAuthor}/${exploitDto.targetRepo}
+            Affected Smart Contract: ${concatNames} at ${exploitDto.targetAddr}
         <br>
             ${exploitDto.description}
         <br>
     </strong>
-    <code>
-        ${exploitDto.script}
-    </code>
     <br>
         &nbsp;
     <br>
     - SolidGuard
 </p>
 `;
+};

@@ -1,6 +1,6 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { Role } from '@prisma/client';
-import { JwtAuthGuard } from './guard/jwt-auth.guard';
+import { SessionAuthGuard } from './guard/session-auth.guard';
 import { Roles } from './guard/roles.decorator';
 import { RolesGuard } from './guard/roles.guard';
 import {
@@ -14,7 +14,7 @@ import {
   ApiBadRequestResponse,
   ApiBody,
   ApiCreatedResponse,
-  ApiHeader,
+  ApiOkResponse,
   ApiOperation,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -30,7 +30,10 @@ export class UserController {
     summary: 'Registers a new user account.',
   })
   @ApiBody({
-    description: 'Registration info for a new user account.',
+    description: `Registration info for a new user account. 
+      Password must have 8-20 characters, 
+      at least one upper case English letter, one lower case English letter, 
+      one number and one special character from [#?!@$ %^&*-].`,
     type: RegisterUserRequestDto,
   })
   @ApiCreatedResponse({
@@ -45,23 +48,20 @@ export class UserController {
     @Body() registerUserRequestDto: RegisterUserRequestDto
   ): Promise<UserResponseDto> {
     return await this.usersService.createAccount({
-      email: registerUserRequestDto.email,
+      name: registerUserRequestDto.name,
       password: registerUserRequestDto.password,
       role: Role.USER,
     });
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(SessionAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
-  @Post('create-new-account')
-  @ApiHeader({
-    name: 'Authorization',
-    description:
-      'The JWT of current login user that contains the username (email).',
-    required: true,
-  })
+  @Post('create')
   @ApiBody({
-    description: 'Account info for a creating a new account.',
+    description: `Account info for a creating a new account. 
+      Password must have 8-20 characters, at least one upper case English letter, 
+      one lower case English letter, one number and one special character from 
+      [#?!@$ %^&*-].`,
     type: CreateAccountRequestDto,
   })
   @ApiCreatedResponse({
@@ -72,12 +72,27 @@ export class UserController {
     description: 'Invalid account info for creation.',
   })
   @ApiUnauthorizedResponse({
-    description: 'The current login user is unauthorized. ',
+    description: 'The current login user is unauthorized.',
   })
   @TransformPlainToClass(UserResponseDto)
   async createAccount(
     @Body() accountData: CreateAccountRequestDto
   ): Promise<UserResponseDto> {
     return await this.usersService.createAccount(accountData);
+  }
+
+  @UseGuards(SessionAuthGuard)
+  @Get()
+  @ApiOkResponse({
+    description: "Returns the current login user's account info.",
+    type: UserResponseDto,
+  })
+  @ApiUnauthorizedResponse({
+    description: 'No user logon.',
+  })
+  getProfile(
+    @Req() req: Request & { userId: string }
+  ): Promise<UserResponseDto> {
+    return this.usersService.getUserById(req.userId);
   }
 }

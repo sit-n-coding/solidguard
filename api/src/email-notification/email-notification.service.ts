@@ -1,7 +1,7 @@
 import * as nodemailer from 'nodemailer';
 import { ConfigService } from '@nestjs/config';
 import { Injectable } from '@nestjs/common';
-import { ExploitDto } from '../exploit/dto';
+import { ExploitResponseDto } from '../exploit/dto';
 import { emailHTML } from '../source/email';
 
 //This part is used to test this single file
@@ -12,7 +12,7 @@ export class EmailNotificationService {
 
   /*This function takes in a data for exploits and also a list of strings containing receiver emails
    */
-  async sendEmail(receiverEmails: string[], exploitDto: ExploitDto) {
+  async sendEmail(receiverEmails: string[], exploitDto: ExploitResponseDto) {
     let finaluser: string;
     let finalpw: string;
     let finalservice: string;

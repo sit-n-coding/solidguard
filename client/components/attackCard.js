@@ -1,22 +1,29 @@
-import * as React from 'react';
+import * as React from "react"
 
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
+import Button from "@mui/material/Button"
+import Typography from "@mui/material/Typography"
 import AttackModal from "../components/attackModal"
 import Colors from "../styles/colors.js"
 
 const AttackCard = (props) => {
-
-    const [open, setOpen] = React.useState(false);
-    const [status, setStatus] = React.useState("Processing");
+    const [open, setOpen] = React.useState(false)
+    const isVerified = props.attackList[props.index].verify
+    const [status, setStatus] = React.useState(isVerified ? "Approved": "Processing")
+    console.log(status)
     const handleOpen = () => {
-        setOpen(true);
-    };
+        setOpen(true)
+    }
 
     return (
-        <div className="AttackCardContainer" style={{ backgroundColor: Colors[5] }} >
+        <div
+            className="AttackCardContainer"
+            style={{ backgroundColor: Colors[5] }}
+        >
             <div className="AttackCardTopRow">
-                <div className="AttackCardTopRowItem" style={{ backgroundColor: Colors[3] }}>
+                <div
+                    className="AttackCardTopRowItem"
+                    style={{ backgroundColor: Colors[3] }}
+                >
                     <div style={{ width: "70%", overflowY: "scroll" }}>
                         <Typography
                             className="HomepageBlockText"
@@ -35,12 +42,9 @@ const AttackCard = (props) => {
                         color={Colors.textLight}
                         noWrap
                     >
-                        by {props.attack.author}
+                        by {props.attack?.author?.name}
                     </Typography>
-
                 </div>
-
-
             </div>
 
             <div className="AttackCardBottomRow">
@@ -51,25 +55,28 @@ const AttackCard = (props) => {
                         align="left"
                         color={Colors.textDark}
                         sx={{
-                            display: '-webkit-box',
-                            overflow: 'hidden',
-                            WebkitBoxOrient: 'vertical',
-                            WebkitLineClamp: 3,
+                            display: "-webkit-box",
+                            overflow: "hidden",
+                            WebkitBoxOrient: "vertical",
+                            WebkitLineClamp: 3
                         }}
                     >
                         {props.attack.description}
                     </Typography>
                 </div>
                 <div className="AttackCardButtonContainer">
-                    <Button className="AttackCardButton" variant="contained" style={{ backgroundColor: Colors[3] }} onClick={() => handleOpen()}>
+                    <Button
+                        className="AttackCardButton"
+                        variant="contained"
+                        style={{ backgroundColor: Colors[3] }}
+                        onClick={() => handleOpen()}
+                    >
                         <Typography
                             variant="h6"
                             align="left"
                             color={Colors.textLight}
                         >
-                            {props.author}
                             Link
-
                         </Typography>
                     </Button>
                     <AttackModal
@@ -78,13 +85,14 @@ const AttackCard = (props) => {
                         attack={props.attack}
                         index={props.index}
                         attackList={props.attackList}
+                        fetchAttacks={props.fetchAttacks}
                         status={status}
                         setStatus={setStatus}
                     />
                 </div>
             </div>
-        </div >
-    );
+        </div>
+    )
 }
 
-export default AttackCard;
+export default AttackCard

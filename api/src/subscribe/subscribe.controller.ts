@@ -1,12 +1,27 @@
-import { Body, Controller, ForbiddenException, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  ForbiddenException,
+  Post,
+  Get,
+  UseGuards,
+  Param,
+} from '@nestjs/common';
 import {
   ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiOperation,
   ApiTags,
+  ApiParam,
 } from '@nestjs/swagger';
+import { SessionAuthGuard } from '../user/guard/session-auth.guard';
+import { UserId } from '../user/guard/user-id.decorator';
 import { ContractService } from '../contract/contract.service';
-import { CreateSubscribeRequestDto, CreateSubscribeResponseDto } from './dto';
+import {
+  CreateSubscribeRequestDto,
+  CreateSubscribeResponseDto,
+  DashboardDto,
+} from './dto';
 import { SubscribeService } from './subscribe.service';
 
 @ApiTags('subscribe')
@@ -28,7 +43,9 @@ export class SubscribeController {
   @ApiForbiddenResponse({
     description: "Signer's address does not match with the deployer's address.",
   })
-  async createSubscribe(
+  @UseGuards(SessionAuthGuard)
+  public async createSubscribe(
+    @UserId() userId: string,
     @Body() bodyReq: CreateSubscribeRequestDto
   ): Promise<CreateSubscribeResponseDto> {
     // create message
@@ -50,6 +67,7 @@ export class SubscribeController {
     return await this.subscribeService.createSubscribe({
       contractAddrs: bodyReq.contractAddrs,
       emailAddrs: bodyReq.emailAddrs,
+      userId,
     });
   }
 
@@ -65,7 +83,7 @@ export class SubscribeController {
     if (
       !(await this.contractService.verifyDevOfContract(
         addr,
-        message.replace(/\s+/g, ''),
+        message.replace(/\s+/, ''),
         signedJSON
       ))
     ) {
@@ -78,5 +96,40 @@ export class SubscribeController {
     if (!contract) {
       contract = await this.contractService.createContractDB(addr);
     }
+  }
+
+  @Get('/:page')
+  @ApiParam({ name: 'page', type: Number })
+  @ApiOperation({ summary: 'Gets dashboard info by userId.' })
+  @ApiCreatedResponse({
+    description: 'Returns the user exploit.',
+    type: DashboardDto,
+  })
+  @ApiForbiddenResponse({
+    description: "Signer's address does not match with the deployer's address.",
+  })
+  @UseGuards(SessionAuthGuard)
+  public async getDashboardByUser(
+    @UserId() userId: string,
+    @Param('page') page: number
+  ): Promise<DashboardDto[]> {
+    const subscribes = await this.subscribeService.getSubscribeByUser(
+      userId,
+      page
+    );
+    const dslst = [];
+    for (const sub of subscribes) {
+      const contract = await this.contractService.getContractDB(
+        sub.contractAddr
+      );
+      const ds = {
+        emailAddr: sub.emailAddr,
+        contractAddr: sub.contractAddr,
+        pausable: contract.pauseable,
+        createAt: sub.createdAt,
+      };
+      dslst.push(ds);
+    }
+    return dslst;
   }
 }

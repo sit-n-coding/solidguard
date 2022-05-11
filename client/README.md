@@ -1,8 +1,14 @@
-# SolidGuard Frontend
+# SolidGuard Client
 
 ## Dependencies
 
 All listed in `package.json`
+
+## Running in Docker
+```bash
+docker build --tag solidguard-client .
+docker run --publish 3000:3000 solidguard-client
+```
 
 ### Prettier
 

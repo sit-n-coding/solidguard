@@ -7,28 +7,27 @@ import {
   ContractDto,
   ContractFromAPIDto,
   EtherscanContractsDto,
-  GithubContractInfoDto,
+  EtherscanContractInfoDto,
 } from './dto';
 import { ContractDAO } from './contract.dao';
-import { GithubDAO } from './github.dao';
 import { solidGuardPauseable } from '../source/solid-guard-pauseable';
 
 @Injectable()
 export class ContractService {
-  private solidGuardPauseable: string;
+  private solidGuardPauseable: ContractFromAPIDto;
   private solidGuardManager: Contract;
   constructor(
     @Inject('ETHProvider')
     private readonly provider: ethers.providers.BaseProvider,
     private readonly contractDAO: ContractDAO,
     private readonly etherscanDAO: EtherscanDAO,
-    private readonly githubDAO: GithubDAO,
     configService: ConfigService
   ) {
     // get source code without whitespace
-    this.solidGuardPauseable = solidGuardPauseable(
-      configService.get<string>('SGM_ADDRESS')
-    );
+    this.solidGuardPauseable = {
+      name: 'SolidGuardPauseable',
+      content: solidGuardPauseable(configService.get<string>('SGM_ADDRESS')),
+    };
 
     // get contract
     this.solidGuardManager = new ethers.Contract(
@@ -61,12 +60,12 @@ export class ContractService {
   }
 
   public async verifyPauseableContract(contractAddr: string): Promise<boolean> {
-    return this.hasContractFromAddr(this.solidGuardPauseable, contractAddr);
+    return this.hasContractsFromAddr([this.solidGuardPauseable], contractAddr);
   }
 
   public async createContractDB(addr: string): Promise<ContractDto> {
-    const pause = await this.verifyPauseableContract(addr);
-    return this.contractDAO.create({ addr, pause });
+    const pauseable = await this.verifyPauseableContract(addr);
+    return this.contractDAO.create({ addr, pauseable });
   }
 
   public async getContractDB(addr: string): Promise<ContractDto> {
@@ -93,27 +92,40 @@ export class ContractService {
     return pauseableContractAddrs;
   }
 
-  public async isValidGithubContract(
-    githubInfo: GithubContractInfoDto
+  public async isValidEtherscanContracts(
+    esInfo: EtherscanContractInfoDto
   ): Promise<boolean> {
-    if (!githubInfo.path.match(/.+\.sol$/g)) {
-      return false;
-    }
     try {
-      return !!(await this.githubDAO.getSourceCode(githubInfo));
+      const contractRes = await this.etherscanDAO.getSourceCode(esInfo.addr);
+      let counter = 0; // can use counter method since all contract names must be unique
+      for (const contract of contractRes.contracts) {
+        if (esInfo.names.includes(contract.name)) {
+          counter++;
+        }
+      }
+      return counter === esInfo.names.length;
     } catch {
       return false;
     }
   }
 
-  public async hasGithubContractFromAddrs(
-    githubInfo: GithubContractInfoDto,
+  public async hasEtherscanContractsFromAddrs(
+    esInfo: EtherscanContractInfoDto,
     contractAddrs: string[]
   ): Promise<string[]> {
-    // get github source code
-    const ghSourceCode: ContractFromAPIDto = await this.githubDAO.getSourceCode(
-      githubInfo
-    );
+    // get source code from etherscan
+    const contractRes: EtherscanContractsDto =
+      await this.etherscanDAO.getSourceCode(esInfo.addr);
+    const targetContracts: ContractFromAPIDto[] = [];
+
+    // check if valid
+    for (const contract of contractRes.contracts) {
+      if (esInfo.names.includes(contract.name)) {
+        targetContracts.push(contract);
+      }
+    }
+    if (targetContracts.length !== esInfo.names.length)
+      throw new Error('Contracts does not exist.');
 
     // get addresses that has this code
     const containPromises: Promise<void>[] = [];
@@ -121,9 +133,7 @@ export class ContractService {
     for (const contractAddr of contractAddrs) {
       containPromises.push(
         (async () => {
-          if (
-            await this.hasContractFromAddr(ghSourceCode.content, contractAddr)
-          ) {
+          if (await this.hasContractsFromAddr(targetContracts, contractAddr)) {
             containsContractAddrs.push(contractAddr);
           }
         })()
@@ -138,8 +148,8 @@ export class ContractService {
     return contracts.map((contractDto) => contractDto.addr);
   }
 
-  private async hasContractFromAddr(
-    sourceCode: string,
+  private async hasContractsFromAddr(
+    targetContracts: ContractFromAPIDto[],
     contractAddr: string
   ): Promise<boolean> {
     // get etherscan source code
@@ -151,16 +161,19 @@ export class ContractService {
       return false;
     }
 
-    // check if it has source code
+    // check if it has source codes
+    let counter = 0;
     for (const contract of esContract.contracts) {
-      if (this.hasContract(sourceCode, contract.content)) {
-        return true;
+      for (const contractTarget of targetContracts) {
+        if (this.hasContract(contractTarget.content, contract.content)) {
+          counter++;
+        }
       }
     }
-    return false;
+    return counter === targetContracts.length;
   }
 
   private hasContract(sourceCode1: string, sourceCode2: string): boolean {
-    return sourceCode1.replace(/\s+/g, '') === sourceCode2.replace(/\s+/g, '');
+    return sourceCode1.replace(/\s+/, '') === sourceCode2.replace(/\s+/, '');
   }
 }

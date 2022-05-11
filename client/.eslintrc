@@ -1,0 +1,24 @@
+// {
+//     "root": true,
+//     "extends": ["next/core-web-vitals", "plugin:prettier/recommended"],
+//     "rules": {
+//         "no-unused-vars": [
+//             "error",
+//             {
+//                 "argsIgnorePattern": "^_",
+//                 "varsIgnorePattern": "^_"
+//             }
+//         ]
+//     }
+// }
+
+// TODO: Re-enable rules by uncommenting the top and deleting the bottom.
+//   from: https://nextjs.org/docs/basic-features/eslint#disabling-rules
+{
+    "extends": "next",
+    "rules": {
+      "react/no-unescaped-entities": "off",
+      "@next/next/no-page-custom-font": "off"
+    }
+}
+  

@@ -3,7 +3,6 @@ import Navbar from "../navbar"
 import Footer from "../footer"
 import { Container } from "@mui/material"
 
-
 export default function Main({ children, router }) {
     return (
         <div>

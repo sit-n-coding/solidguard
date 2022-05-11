@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { CreateSubscribeDto } from './dto';
+import { CreateSubscribeDto, SubscribeDto } from './dto';
 import { SubscribeDAO } from './subscribe.dao';
-
 @Injectable()
 export class SubscribeService {
   constructor(private readonly subscribeDAO: SubscribeDAO) {}
@@ -15,7 +14,11 @@ export class SubscribeService {
         createPromises.push(
           (async () => {
             try {
-              await this.subscribeDAO.create(email, contract);
+              await this.subscribeDAO.create(
+                email,
+                contract,
+                createSubscribeDto.userId
+              );
             } catch (e) {
               console.error(e);
             }
@@ -43,5 +46,12 @@ export class SubscribeService {
       strlst.push(sub.emailAddr);
     }
     return strlst;
+  }
+
+  async getSubscribeByUser(
+    userId: string,
+    page: number
+  ): Promise<SubscribeDto[]> {
+    return await this.subscribeDAO.getSubscribeByUser(userId, page);
   }
 }

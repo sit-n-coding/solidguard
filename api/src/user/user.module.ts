@@ -3,14 +3,11 @@ import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { UserDAO } from './user.dao';
 import { AuthService } from './auth.service';
-import { JwtStrategy } from './strategy/jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './auth.controller';
-import { JwtAuthGuard } from './guard/jwt-auth.guard';
-import { LocalAuthGuard } from './guard/local-auth.guard';
+import { SessionAuthGuard } from './guard/session-auth.guard';
 import { RolesGuard } from './guard/roles.guard';
-import { LocalStrategy } from './strategy/local.strategy';
 
 @Module({
   imports: [
@@ -23,16 +20,7 @@ import { LocalStrategy } from './strategy/local.strategy';
     }),
   ],
   controllers: [UserController, AuthController],
-  providers: [
-    UserService,
-    UserDAO,
-    AuthService,
-    JwtStrategy,
-    LocalStrategy,
-    RolesGuard,
-    LocalAuthGuard,
-    JwtAuthGuard,
-  ],
-  exports: [RolesGuard, JwtAuthGuard, LocalAuthGuard, UserService, AuthService],
+  providers: [UserService, UserDAO, AuthService, RolesGuard, SessionAuthGuard],
+  exports: [RolesGuard, SessionAuthGuard, UserService, AuthService],
 })
 export class UserModule {}

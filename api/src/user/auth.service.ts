@@ -1,31 +1,28 @@
 import * as bcrypt from 'bcrypt';
 import { Injectable } from '@nestjs/common';
-import { UserService } from './user.service';
 import { JwtService } from '@nestjs/jwt';
 import { UserResponseDto } from './dto';
 import { TransformPlainToClass } from 'class-transformer';
-import { LoginUserJwtTokenResponse } from './dto';
+import { UserDAO } from './user.dao';
 
 @Injectable()
 export class AuthService {
-  constructor(
-    private usersService: UserService,
-    private jwtService: JwtService
-  ) {}
+  // TODO: Refactor service classes out of this one.
+  constructor(private userDAO: UserDAO, private jwtService: JwtService) {}
 
   @TransformPlainToClass(UserResponseDto)
-  async validateUser(email: string, pass: string): Promise<UserResponseDto> {
-    const user = await this.usersService.getUserByEmail(email);
+  async validateUser(name: string, pass: string): Promise<UserResponseDto> {
+    const user = await this.userDAO.getByName(name);
     if (user && bcrypt.compareSync(pass, user.password)) {
       return user;
     }
     return null;
   }
 
-  async login(user: any): Promise<LoginUserJwtTokenResponse> {
+  async login(user: any): Promise<string> {
     const payload = { userId: user.id };
-    return {
-      access_token: this.jwtService.sign(payload),
-    };
+    return this.jwtService.sign(payload, {
+      secret: process.env.JWT_ACCESS_SECRET,
+    });
   }
 }

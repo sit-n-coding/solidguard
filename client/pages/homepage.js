@@ -1,144 +1,92 @@
 import Button from "@mui/material/Button"
 import Typography from "@mui/material/Typography"
-import Grid from "@mui/material/Grid"
+import * as React from "react"
 import { createTheme, ThemeProvider, styled } from "@mui/material/styles"
 import Colors from "../styles/colors.js"
-import Link from 'next/link'
-import Image from 'next/image'
-import SGSim from "../styles/SG_sim.svg";
-import SGBanner from "../styles/SG_banner.svg";
-import SGLibrary from "../styles/SG_library.svg";
+import Link from "next/link"
+import Image from "next/image"
+import SGSim from "../styles/SG_sim.png"
+import SGBanner from "../styles/SG_banner.svg"
+import SGLibrary from "../styles/SG_library.svg"
+import { AuthContext } from '../components/authContext'
 
 const theme = createTheme({
     typography: {
-        fontFamily: "Assistant",
+        fontFamily: "Assistant"
     },
 
     palette: {
         primary: {
             main: Colors["1"],
-            darker: '#053e85',
+            darker: "#053e85"
         }
-    },
+    }
 })
 
 theme.typography.h4 = {
-    fontSize: '1.2rem',
-    '@media (min-width:600px)': {
-        fontSize: '1.5rem',
+    fontSize: "1.2rem",
+    "@media (min-width:600px)": {
+        fontSize: "1.5rem"
     },
-    [theme.breakpoints.up('md')]: {
-        fontSize: '2.4rem',
-    },
+    [theme.breakpoints.up("md")]: {
+        fontSize: "2.4rem"
+    }
+}
 
-};
-
-const HomepageBlock = (props) => {
-    return (
-        <div className="HomepageBlockContainer" style={{ background: props.banner ? `linear-gradient(${Colors["3"]},${Colors["4"]})` : Colors["4"] }}>
-
-            <div className="HomepageTextBlock">
-                <Typography
-                    className="HomepageBlockText"
-                    variant="h6"
-                    align="left"
-                    color={Colors.textLight}
-                >
-                    {props.label}
-                </Typography>
-            </div>
-
-            <div className="HomepageButtonBlock">
-                <Link
-                    href={props.link}
-                    passHref>
-                    <Button className="HomepageButton" variant="contained" color="primary">
-                        <Typography variant="h6">
-                            {props.buttonText}
-                        </Typography>
-                    </Button>
-                </Link>
-            </div>
-
-            {props.banner ? <Image className="BannerImage" src={SGLibrary} alt="" layout="fill" /> : null}
-
-        </div>
-    )
+theme.typography.h5 = {
+    fontWeight: "1000",
+    fontSize: "1.2rem"
 }
 
 const Homepage = (props) => {
+    const [authState, updateAuthState] = React.useContext(AuthContext);
+    const userId = authState.userId;
+
     return (
-        <ThemeProvider theme={theme}>
+        <div id="parentContainer" style={{ display: "flex", height: "100vh", width: "100vw", backgroundColor: Colors[5], alignItems: "center" }}>
+            <ThemeProvider theme={theme}>
+                <div style={{display: "flex", flexDirection: "column", width: "40%"}}>
+                    <Typography align="left" variant="h4" style={{ marginLeft: "30px" }}>
+                        Protect the future of blockchain,
+                    </Typography>
+                    <Typography align="left" variant="h4" style={{ marginLeft: "30px", marginBottom: "20px" }}>
+                        one vulnerability at a time.
+                    </Typography>
+                    <Typography align="left" variant="h6" style={{ marginLeft: "30px" }}>
+                        There's no place for hackers on blockchain - band together to strategize against exploited ledgers.
+                    </Typography>
 
-            <Grid className="HomepageContainer" container direction="row">
-                <Grid className="LandingRowContainer" container xs={12} style={{ backgroundColor: Colors[5] }}>
-                    <Grid
-                        className="LandingTextContainer"
-                        container
-                        xs={8}
-                        justifyContent="center"
-                        alignItems="center"
+                    <div style={{display: "flex"}}>
+
+                    <Button
+                        href={userId ? "/securitycheck" : "/signin"}
+                        variant="contained"
+                        sx={{marginLeft: "30px", marginTop: "30px", width: "200px", height: "60px", borderRadius: "10px", backgroundColor: Colors[1] }}
                     >
-                        <Typography
-                            id="LandingText"
-                            variant="h4"
-                            align="left"
-                        >
-                            We are an open sourced attack library
-                            created to help blockchain applications
-                            enhance their security
-                        </Typography>
-                    </Grid>
+                        <Typography variant="h5" style={{fontWeight: "4000"}}>Get Protected</Typography>
 
-                    <Grid
-                        className="LandingImageContainer"
-                        item
-                        xs={4}
-                        style={{ background: `linear-gradient(to right, ${Colors["5"]} 40%,${Colors["1"]} 440%)` }}
+                    </Button>
+
+                    <Button
+                        href={userId ? "/contribute" : "/signin"}
+                        variant="contained"
+                        sx={{marginLeft: "30px", marginTop: "30px", width: "200px", height: "60px", borderRadius: "10px", backgroundColor: Colors[4], color: "white" }}
                     >
-                        <Image src={SGSim} alt="hi" />
-                    </Grid>
+                        <Typography variant="h5" style={{fontWeight: "4000"}}>Contribute Now</Typography>
 
-                </Grid>
-
-                <Grid container xs={6} direction="column" style={{ backgroundColor: "green" }}>
-                    <HomepageBlock label="A developer and Just want to see the attack library?" buttonText="Attack Library" backgroundColor={Colors[4]} banner={true} link="/attacklibrary" />
-                    <HomepageBlock label="join the community and help contribute to our library so other developers to learn from your example" buttonText="Contribute Now" backgroundColor={Colors[4]} link="/contribute" />
-                </Grid>
-
-                <Grid
-                    className="InstructionsBlockContainer"
-                    container
-                    xs={6}
-                    justifyContent="center"
-                    alignItems="center"
-                    style={{ background: `linear-gradient(to right, ${Colors["3"]} 20%,${Colors["4"]} 100%)` }}
-                >
-                    <div style={{ width: "80%" }}>
-                        <Typography
-                            variant="h5"
-                            align="left"
-                            color={Colors.textLight}
-                        >
-                            Find out if your application can survive our hacking simulator just by signing up and pasting your blockcahin address.
-                        </Typography>
+                    </Button>
                     </div>
-                    <div style={{ marginLeft: "auto", marginTop: "auto" }}>
-                        <Link
-                            href={"/signin"}
-                            passHref>
-                            <Button className="HomepageButton" variant="contained" color="primary">
-                                <Typography variant="h6">
-                                    Get Started Now!
-                                </Typography>
-                            </Button>
-                        </Link>
-                    </div>
-                    <Image className="BannerImage" src={SGBanner} alt="" layout="fill" />
-                </Grid>
-            </Grid>
 
-        </ThemeProvider >
+                </div>
+                <div style={{ height: "70%", marginLeft: "auto" }}>
+                    <Image
+                        src={SGSim}
+                    />
+                </div>
+            </ThemeProvider>
+
+        </div>
+
     )
 }
 

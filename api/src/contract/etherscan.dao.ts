@@ -26,10 +26,11 @@ export class EtherscanDAO {
     ) {
       throw Error('Failed to retrieve smart contract.');
     }
-    return this.parseSourceCode(
+    const scObj = this.parseSourceCode(
       res.data['result'][0]['SourceCode'],
       res.data['result'][0]['ContractName']
     );
+    return scObj;
   }
 
   public async getDeployerAddress(contractAddress: string): Promise<string> {
@@ -63,8 +64,11 @@ export class EtherscanDAO {
   private sourceToContracts(sourceCode: JSON): EtherscanContractsDto {
     const contracts: ContractFromAPIDto[] = [];
     for (const key of Object.keys(sourceCode['sources'])) {
+      // parse smart contract name out
+      const pathLst = key.split('/');
+      const name = pathLst[pathLst.length - 1].replace('.sol', '');
       contracts.push({
-        name: key,
+        name,
         content: sourceCode['sources'][key]['content'],
       });
     }

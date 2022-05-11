@@ -1,115 +1,90 @@
-import * as React from 'react';
-import Box from '@mui/material/Box';
+import * as React from "react"
+import Box from "@mui/material/Box"
 import Colors from "../styles/colors.js"
-import Modal from '@mui/material/Modal';
-import Button from '@mui/material/Button';
+import Modal from "@mui/material/Modal"
+import Button from "@mui/material/Button"
 import Typography from "@mui/material/Typography"
 import Grid from "@mui/material/Grid"
-import SyntaxHighlighter from 'react-syntax-highlighter';
-import { docco } from 'react-syntax-highlighter/dist/cjs/styles/hljs';
-import { dark } from 'react-syntax-highlighter/dist/cjs/styles/hljs';
-import Chip from '@mui/material/Chip';
-import Stack from '@mui/material/Stack';
-import CheckBoxIcon from '@mui/icons-material/CheckBox';
-import DangerousIcon from '@mui/icons-material/Dangerous';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import CloseIcon from '@mui/icons-material/Close';
-import IconButton from '@mui/material/IconButton';
-import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import DownloadIcon from '@mui/icons-material/Download';
-import { useState } from "react";
-import { flexbox } from '@mui/system';
+import SyntaxHighlighter from "react-syntax-highlighter"
+import { docco } from "react-syntax-highlighter/dist/cjs/styles/hljs"
+import { dark } from "react-syntax-highlighter/dist/cjs/styles/hljs"
+import Chip from "@mui/material/Chip"
+import Stack from "@mui/material/Stack"
+import CheckBoxIcon from "@mui/icons-material/CheckBox"
+import LinkIcon from '@mui/icons-material/Link';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import CloseIcon from "@mui/icons-material/Close"
+import IconButton from "@mui/material/IconButton"
+import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft"
+import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight"
+import DownloadIcon from "@mui/icons-material/Download"
+import { useState, useContext } from "react"
+import { flexbox } from "@mui/system"
+import { AuthContext } from './authContext'
+import TableCell from '@mui/material/TableCell';
+import TableRow from '@mui/material/TableRow';
+import { fetchAPI } from "./fetchAPI.js"
 
 const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: "80%",
-    height: "90%",
-    bgcolor: 'background.paper',
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: "955px",
+    height: "61%",
+    bgcolor: "background.paper",
     borderRadius: "10px",
     boxShadow: 24,
     pt: 2,
     px: 4,
-    pb: 3,
-};
+    pb: 3
+}
 
 const statuses = {
-    "Approved": "#95EE9E",
+    Approved: "#95EE9E",
     "On Hold": "#D8E1FF",
-    "Unapproved": "#FF6060",
-    "Processing": "#D9D9D9"
-}
-
-const VerifiedHeader = (props) => {
-    return (<div classname="ProcessingContainer">
-        <div className="CloseButton">
-            <IconButton component="span" onClick={() => props.setOpen(false)}>
-                <CloseIcon />
-            </IconButton>
-        </div>
-    </div>)
-}
-
-const ProcessingHeader = (props) => {
-    return (
-        <div classname="ProcessingContainer">
-            <div className="CloseButton">
-
-                <div className="ProcessingButtonList">
-                    <Button className="AcceptButton" variant="contained" startIcon={<CheckBoxIcon />} onClick={() => props.setStatus("Approved")}>
-                        <Typography variant="button" color={Colors["textDark"]}>Approve</Typography>
-                    </Button>
-                    <Button className="HoldButton" variant="contained" startIcon={<AccessTimeIcon />} onClick={() => props.setStatus("Processing")}>
-                        <Typography variant="button" color={Colors["textDark"]}>On Hold</Typography>
-                    </Button>
-                    <Button className="UnapproveButton" variant="contained" startIcon={<DangerousIcon />} onClick={() => props.setStatus("Unapproved")}>
-                        <Typography variant="button" color={Colors["textDark"]}>Deny</Typography>
-                    </Button>
-                </div>
-                <IconButton component="span" onClick={() => props.setOpen(false)}>
-                    <CloseIcon />
-                </IconButton>
-            </div>
-
-
-
-        </div>)
+    Unapproved: "#FF6060",
+    Processing: "#D9D9D9"
 }
 
 const NestedModal = (props) => {
-
-    const codeString = 'pragma solidity ^0.4.22;\ncontract helloWorld {\nfunction renderHelloWorld () public pure returns (string) {\nreturn \'Hello, World!\';\n}}';
-    let verified;
-    const [index, setIndex] = useState(props.index);
-
-    React.useEffect(() => {
-        verified = props.attackList[index].verify;
-    }, [])
+    let verified = props.attackList[props.index].verified
+    let baseUrl = process.env.ETHERSCAN_URL != null ? process.env.ETHERSCAN_URL : 'https://rinkeby.etherscan.io/'
+    let etherscan = `${baseUrl}address/${props?.attackList[props.index]?.targetAddr}`
+    const [index, setIndex] = useState(props.index)
 
     const prevAttack = () => {
         if (index != 0) {
-            setIndex(index - 1);
+            setIndex(index - 1)
         }
     }
 
     const nextAttack = () => {
         if (index != props.attackList.length - 1) {
-            setIndex(index + 1);
+            setIndex(index + 1)
         }
     }
 
-    const downloadTxtFile = () => {
-        const element = document.createElement("a");
-        const file = new Blob([codeString],
-            { type: 'text/plain;charset=utf-8' });
-        element.href = URL.createObjectURL(file);
-        element.download = props.attackList[index].name + ".txt";
-        document.body.appendChild(element);
-        element.click();
+    const onVerify = async (e) => {
+        const response = await fetchAPI(`/exploit/verify/${props.exploitId}/`, {
+            method: "PATCH",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+            },
+        })
+        if (response.status === 200) {
+            props.setStatus("Approved")
+            props.setOpen(false)
+            await props.fetchAttacks()
+        } else {
+            console.log("error") // unauthorized
+            props.setOpen(false)
+        }
     }
+
+    const [authState, updateAuthState] = useContext(AuthContext);
+    const role = authState.role;
 
     return (
         <div>
@@ -123,40 +98,108 @@ const NestedModal = (props) => {
                 <Box sx={style}>
                     <div className="ModalHeader">
                         <div>
-                            <div className="TitleRow" >
-                                <h2 style={{ width: "80%" }} id="parent-modal-title">{props.attackList[index].name}</h2>
-                                <div className="Tags">
-                                    <Stack direction="row" spacing={1}>
-                                        <Chip label={"Status: " + props.status} style={{ backgroundColor: statuses[props.status] }} />
-                                    </Stack>
-                                </div>
+                            <TableRow>
+                                <TableCell>
+                                    <h2
+                                        id="parent-modal-title"
+                                    >
+                                        {props.attackList[index].name}
+                                    </h2>
+                                </TableCell>
+                                <TableCell>Published on{" "} {props.attackList[index].createdAt}</TableCell>
+                                <TableCell>Author: {props.attackList[index]?.author?.name}</TableCell>
+                                <TableCell align="right">
+                                    <div className="Tags">
+                                        <Stack direction="row" spacing={1}>
+                                            <Chip
+                                                label={"Status: " + props.status}
+                                                style={{
+                                                    backgroundColor:
+                                                        statuses[props.status]
+                                                }}
+                                            />
+                                        </Stack>
+                                    </div>
+                                </TableCell>
+                                {!verified && (role === "ADMIN")  ?
+                                    <TableCell align="right">
+                                        <Button
+                                            className="AcceptButton"
+                                            variant="contained"
+                                            startIcon={<CheckBoxIcon />}
+                                            onClick={onVerify}
+                                        >
+                                            <Typography variant="button" color={Colors["textDark"]}>
+                                                Approve
+                                            </Typography>
+                                        </Button>
+                                    </TableCell>
+                                    : null
+                                }
+                                <TableCell>
+                                    <IconButton
+                                        component="span"
+                                        onClick={() => props.setOpen(false)}
+                                    >
+                                        <CloseIcon />
+                                    </IconButton>
+                                </TableCell>
+                            </TableRow>
                             </div>
-                            <div className="SubtitleRow" >
-                                <Typography variant="body1" color={Colors["4"]}>Published on {props.attackList[index].createdAt}</Typography>
-                                <Typography variant="body1" color={Colors["4"]}>Author: {props.attackList[index].author}</Typography>
-                            </div>
-                            <div style={{ height: "50px", overflow: "scroll" }}>
-                                <Typography variant="body1" color={Colors["textDark"]}>{props.attackList[index].description}</Typography>
-                            </div>
+                            <Typography
+                                variant="body1"
+                                color={Colors["textDark"]}
+                                style={{ height: "80px", width: "90%", marginTop: "16px", marginBottom: "14px", overflow: "scroll" }}
+                            >
+                                {props.attackList[index].description}
+                            </Typography>
+                        <Typography variant="h5">Smart Contract</Typography>
+                        <div style={{ width: "90%", marginBottom: "20px" }}>
+                            <hr />
                         </div>
-                        {verified ? <VerifiedHeader /> : <ProcessingHeader setOpen={props.setOpen} setStatus={props.setStatus} />}
+                        <Typography
+                                variant="body1"
+                                color={Colors["textDark"]}
+                            >
+                                <b>{props.attackList[index].targetNames.join(', ')}</b>
+                            </Typography>
+                        <div style={{ display: "flex", flexDirection: "row", height: "45px" }}>
+                            <SyntaxHighlighter
+                                className="CodePreview"
+                                style={{ textColor: 'black' }}
+                            >
+                                {props.attackList[index].targetAddr}
+                            </SyntaxHighlighter>
+                        </div>
+                            <Button
+                                component="span"
+                                onClick={() => navigator.clipboard.writeText(props.attackList[index].targetAddr)}
+                                startIcon={<LinkIcon />}
+                                style={{ color: "black" }}
+                            >
+                                <a href={etherscan} >Open in Etherscan</a>
+                            </Button>
+                            <IconButton
+                                    component="span"
+                                    onClick={() => navigator.clipboard.writeText(props.attackList[index].targetAddr)}
+                            >
+                                <ContentCopyIcon />
+                            </IconButton>
                     </div>
-                    <div className="CodeButtonsContainer">
-                        <div className="LeftRightButtonContainer">
-                            <IconButton className="LeftRightButton" component="span" onClick={prevAttack}>
+                    <div>
+                        <div style={{ display: "flex", flexDirection: "row", marginBottom: "100px", justifyContent: 'space-between' }}>
+                            <IconButton
+                                className="LeftRightButton"
+                                component="span"
+                                onClick={prevAttack}
+                            >
                                 <KeyboardArrowLeftIcon />
                             </IconButton>
-                        </div>
-                        <div>
-                            <SyntaxHighlighter className="CodePreview" language="solidity" style={dark} showLineNumbers>
-                                {props.attackList[index].script}
-                            </SyntaxHighlighter>
-                            <Button startIcon={<DownloadIcon />} onClick={downloadTxtFile}>
-                                <Typography variant="button" color={Colors["textDark"]}>Download text file</Typography>
-                            </Button>
-                        </div>
-                        <div className="LeftRightButtonContainer">
-                            <IconButton className="LeftRightButton" component="span" onClick={nextAttack}>
+                            <IconButton
+                                className="LeftRightButton"
+                                component="span"
+                                onClick={nextAttack}
+                            >
                                 <KeyboardArrowRightIcon />
                             </IconButton>
                         </div>
@@ -164,7 +207,7 @@ const NestedModal = (props) => {
                 </Box>
             </Modal>
         </div>
-    );
+    )
 }
 
-export default NestedModal;
+export default NestedModal

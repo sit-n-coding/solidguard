@@ -4,29 +4,29 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("POSTGRES_URL")
 }
 
 model User {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  email     String   @unique
-  password  String
-  role      Role
+  id            String      @id @default(uuid())
+  createdAt     DateTime    @default(now())
+  name          String      @unique
+  password      String
+  subscriptions Subscribe[]
+  exploits      Exploit[]
+  role          Role
 }
 
 model Exploit {
-  id           String   @id @default(cuid())
-  createdAt    DateTime @default(now())
-  name         String   @unique
-  author       String
-  description  String
-  script       String
-  targetAuthor String
-  targetRepo   String
-  targetPath   String
-  targetRef    String
-  verify       Boolean  @default(false)
+  id            String   @id @default(uuid())
+  createdAt     DateTime @default(now())
+  name          String   @unique
+  author        User     @relation(fields: [authorUserId], references: [id])
+  authorUserId  String
+  description   String
+  targetAddr    String
+  targetNames   String[]
+  verified      Boolean  @default(false)
 }
 
 enum Role {
@@ -36,7 +36,7 @@ enum Role {
 
 model Contract {
   addr      String      @id
-  pause     Boolean     @default(false)
+  pauseable Boolean     @default(false)
   createdAt DateTime    @default(now())
   Subscribe Subscribe[]
 }
@@ -45,6 +45,8 @@ model Subscribe {
   createdAt    DateTime @default(now())
   emailAddr    String
   contractAddr String
+  user         User     @relation(fields: [userId], references: [id])
+  userId       String
   contract     Contract @relation(fields: [contractAddr], references: [addr])
 
   @@id([emailAddr, contractAddr])

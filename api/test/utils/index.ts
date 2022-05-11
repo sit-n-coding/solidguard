@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaClient } from '@prisma/client';
 import { AppModule } from '../../src/app.module';
-import { assert } from 'chai';
 
 export const prismaClient = new PrismaClient();
 
@@ -26,7 +25,7 @@ export const expectAnyAsyncError = async (
   } catch (e) {
     return;
   }
-  assert.fail('Error is not thrown');
+  throw new Error('Error is not thrown');
 };
 
 export const promiseTimer = async (delay: number) => {

@@ -1,24 +1,45 @@
-FROM amd64/node:14-alpine3.14
-WORKDIR /backend
+ARG PORT
 
-# install dependencies
-RUN apk update
-RUN apk add postgresql-client
-RUN apk add dos2unix
-RUN apk --no-cache add --virtual builds-deps build-base python3
+FROM amd64/node:14-alpine3.14 AS deps
+WORKDIR /api
 
-# install node dependencies and build application
-COPY ./package.json ./
-COPY ./prisma ./prisma/
-RUN npm i
-COPY . .
+COPY package.json package-lock.json ./
+RUN npm clean-install
+COPY prisma ./prisma/
 RUN npx prisma generate
+
+
+FROM amd64/node:14-alpine3.14 AS builder
+WORKDIR /api
+
+COPY --from=deps /api/node_modules ./node_modules
+COPY . .
+
 RUN npm run build
 
-# format script
-RUN chmod +x ./prisma/wait-for-postgres.sh
-RUN dos2unix ./prisma/wait-for-postgres.sh
 
-# wait for postgres, then migrate and run build
+FROM amd64/node:14-alpine3.14 AS runner
+WORKDIR /api
+
+RUN apk update \
+    && apk --no-cache add postgresql-client \
+    && apk --no-cache add --virtual \
+        builds-deps \
+        build-base \
+        python3
+
+ENV NODE_ENV production
+
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 prisma
+
+COPY --from=builder --chown=prisma:nodejs /api/node_modules ./node_modules
+COPY --from=builder --chown=prisma:nodejs /api/dist ./dist
+COPY --from=builder --chown=prisma:nodejs /api/prisma ./prisma
+COPY --from=builder --chown=prisma:nodejs /api/package.json ./package.json
+
+USER prisma
+
 EXPOSE ${PORT}
-CMD sh ./prisma/wait-for-postgres.sh npx prisma migrate deploy && node dist/src/main
+
+CMD ["sh", "-c", "npx prisma migrate deploy && exec node dist/main"]

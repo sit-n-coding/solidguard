@@ -1,39 +1,27 @@
 import { Role } from '@prisma/client';
-import { IsEmail, IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import {
+  IsAlphanumeric,
+  IsEnum,
+  IsNotEmpty,
+  IsString,
+  Matches,
+} from 'class-validator';
 import { Exclude, Expose } from 'class-transformer';
 import { ApiProperty, ApiResponseProperty } from '@nestjs/swagger';
 
-export class LoginUserJwtTokenResponse {
-  @ApiResponseProperty()
-  access_token: string;
-}
-
-export class LoginUserRequestDto {
-  @IsEmail()
-  @ApiProperty({
-    example: 'admin@coolswap.com',
-  })
-  email: string;
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty({
-    example: 'pass',
-  })
-  password: string;
-}
-
-export class JwtPayloadDto {
-  userId: string;
-}
+// source: https://ihateregex.io/expr/password/
+// 8-20 characters, at least one upper case English letter, one lower case English letter, one number and one special character.
+const passwordRegex =
+  /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,20}$/;
 
 export class CreateAccountRequestDto {
-  @IsEmail()
+  @IsAlphanumeric()
   @ApiProperty({
-    example: 'admin@coolswap.com',
+    example: 'coolswap',
   })
-  email: string;
+  name: string;
   @IsString()
-  @IsNotEmpty()
+  @Matches(passwordRegex)
   @ApiProperty({
     example: 'pass',
   })
@@ -44,13 +32,13 @@ export class CreateAccountRequestDto {
 }
 
 export class RegisterUserRequestDto {
-  @IsEmail()
+  @IsAlphanumeric()
   @ApiProperty({
-    example: 'admin@coolswap.com',
+    example: 'coolswap',
   })
-  email: string;
+  name: string;
   @IsString()
-  @IsNotEmpty()
+  @Matches(passwordRegex)
   @ApiProperty({
     example: 'pass',
   })
@@ -61,8 +49,23 @@ export class RegisterUserRequestDto {
 export class UserResponseDto {
   id: string;
   createdAt: Date;
-  email: string;
+  name: string;
   role: Role;
   @Exclude()
   password?: string;
+}
+
+export class LoginRequestDto {
+  @IsAlphanumeric()
+  @IsNotEmpty()
+  @ApiProperty({
+    example: 'coolswap',
+  })
+  name: string;
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
+    example: 'pass',
+  })
+  password: string;
 }

@@ -1,0 +1,46 @@
+version: "3.8"
+
+name: solidguard-test
+
+services:
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_USERNAME: postgres
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+
+  api:
+    build:
+      context: ../
+      dockerfile: test/Dockerfile
+    env_file:
+      - ../../.env # for PROVIDER_URL, ETHERSCAN_API_KEY, and DEPLOY_PRIVATE_KEY
+    environment:
+      PROVIDER_URL:
+      ETHERSCAN_API_KEY:
+      DEPLOY_PRIVATE_KEY:
+      POSTGRES_URL: postgres://postgres:postgres@postgres:5432/
+      ETHERSCAN_URL: https://api-rinkeby.etherscan.io/
+      SGM_ADDRESS: '0x05BA813eA8d76b1553f68A1b5dC942e71846adD9'
+      JWT_ACCESS_SECRET: 'nestjsPrismaAccessSecret'
+      JWT_EXPIRES_TIME: '60s'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    links:
+      - postgres
+      - redis

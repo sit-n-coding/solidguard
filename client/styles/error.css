@@ -1,0 +1,22 @@
+#NotFoundPage {
+    height: 80vh;
+    text-align: center;
+}
+
+.errorImage {
+    height: 300px;
+    width: 400px;
+    align-self: center;
+}
+
+.errorContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    flex-wrap: nowrap;
+}
+
+.errorLink {
+    text-decoration: underline;
+}
+

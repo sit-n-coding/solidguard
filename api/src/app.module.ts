@@ -7,6 +7,9 @@ import { SubscribeModule } from './subscribe/subscribe.module';
 import { BullModule } from '@nestjs/bull';
 import { EmailNotificationModule } from './email-notification/email-notification.module';
 import { UserModule } from './user/user.module';
+import { ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerGuardBehindProxy } from './throttler/throttler.guard';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -21,6 +24,15 @@ import { UserModule } from './user/user.module';
           port: config.get<number>('REDIS_PORT'),
         },
       }),
+      imports: [ConfigModule],
+      inject: [ConfigService],
+    }),
+    ThrottlerModule.forRootAsync({
+      useFactory: async (conf: ConfigService) => ({
+        ttl: conf.get<number>('THROTTLER_TTL'),
+        limit: conf.get<number>('THROTTLER_LIMIT'),
+      }),
+      imports: [ConfigModule],
       inject: [ConfigService],
     }),
     ContractModule,
@@ -28,6 +40,12 @@ import { UserModule } from './user/user.module';
     SubscribeModule,
     EmailNotificationModule,
     UserModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuardBehindProxy,
+    },
   ],
 })
 export class AppModule {}

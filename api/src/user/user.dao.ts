@@ -15,9 +15,9 @@ export class UserDAO {
     });
   }
 
-  async getByEmail(email: string): Promise<User> {
+  async getByName(name: string): Promise<User> {
     return await this.prisma.user.findUnique({
-      where: { email },
+      where: { name },
     });
   }
 
@@ -25,7 +25,7 @@ export class UserDAO {
     const hash = bcrypt.hashSync(accountData.password, this.saltRounds);
     return await this.prisma.user.create({
       data: {
-        email: accountData.email,
+        name: accountData.name,
         password: hash,
         role: accountData.role,
       },

@@ -1,38 +1,54 @@
-import { Controller, Request, Post, Get, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  UseGuards,
+  UnauthorizedException,
+  Body,
+  Session,
+  Res,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { JwtAuthGuard } from './guard/jwt-auth.guard';
-import { LocalAuthGuard } from './guard/local-auth.guard';
-import { LoginUserRequestDto, UserResponseDto } from './dto';
-import { LoginUserJwtTokenResponse } from './dto';
+import { SessionAuthGuard } from './guard/session-auth.guard';
+import { LoginRequestDto } from './dto';
 import {
   ApiBadRequestResponse,
   ApiBody,
-  ApiCreatedResponse,
-  ApiHeader,
   ApiNotFoundResponse,
-  ApiOkResponse,
   ApiOperation,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { CookieOptions, Response } from 'express';
+import { ConfigService } from '@nestjs/config';
 
 @ApiTags('authorization')
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  private cookieOptions: CookieOptions = {
+    path: '/',
+    sameSite: 'lax', // lax if cookie, strict if session
+    httpOnly: false, // false if cookie, true if session
+    secure: false, // true if SECURE env is true
+    maxAge: null, // specified in MAX_AGE env
+  };
 
-  @UseGuards(LocalAuthGuard)
+  constructor(
+    private readonly authService: AuthService,
+    private readonly configService: ConfigService
+  ) {
+    this.cookieOptions.secure =
+      this.configService.get('SECURE') &&
+      this.configService.get('SECURE') === 'true';
+    this.cookieOptions.maxAge = this.configService.get<number>('MAX_AGE');
+  }
+
   @Post('login')
   @ApiOperation({
     summary: 'Logins a user.',
   })
   @ApiBody({
     description: 'User information to login.',
-    type: LoginUserRequestDto,
-  })
-  @ApiCreatedResponse({
-    description: 'Returns the JWT for current login user.',
-    type: LoginUserJwtTokenResponse,
+    type: LoginRequestDto,
   })
   @ApiBadRequestResponse({
     description: 'Invalid user info for login.',
@@ -40,30 +56,37 @@ export class AuthController {
   @ApiNotFoundResponse({
     description: 'User info not found in the database.',
   })
-  async login(@Request() req): Promise<LoginUserJwtTokenResponse> {
-    return this.authService.login(req.user);
+  async login(
+    @Body() body: LoginRequestDto,
+    @Session() session: Record<string, any>,
+    @Res({ passthrough: true }) res: Response
+  ): Promise<void> {
+    const user = await this.authService.validateUser(body.name, body.password);
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+    // set userId session
+    session.userId = user.id;
+
+    // create new cookie
+    res.cookie('userId', user.id, this.cookieOptions);
+    res.cookie('role', user.role, this.cookieOptions);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Get('profile')
-  @ApiHeader({
-    name: 'Authorization',
-    description:
-      'The JWT of current login user that contains the username (email).',
-    required: true,
-  })
-  @ApiBody({
-    description: 'Valid JWT of current login user.',
-    type: LoginUserRequestDto,
-  })
-  @ApiOkResponse({
-    description: 'Returns the current login user account info.',
-    type: UserResponseDto,
+  @UseGuards(SessionAuthGuard)
+  @Post('logout')
+  @ApiOperation({
+    summary: 'Logs out the user and clears any relevant cookies',
   })
   @ApiUnauthorizedResponse({
     description: 'No user logon.',
   })
-  getProfile(@Request() req): Promise<UserResponseDto> {
-    return req.user;
+  logout(
+    @Session() session: Record<string, any>,
+    @Res({ passthrough: true }) res: Response
+  ): void {
+    session.userId = null;
+    res.clearCookie('userId', this.cookieOptions);
+    res.clearCookie('role', this.cookieOptions);
   }
 }

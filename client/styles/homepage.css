@@ -4,13 +4,11 @@
 }
 .LandingRowContainer {
     background-color: yellow;
-    height: 210px;
 }
 
 #LandingText {
     margin-left: 40px;
     margin-top: 46px;
-    margin-bottom: 64px;
 }
 #LandingImage {
     background-color: blue;

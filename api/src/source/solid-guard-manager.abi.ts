@@ -1,5 +1,10 @@
 export const solidGuardManagerABI = [
   {
+    inputs: [],
+    stateMutability: 'nonpayable',
+    type: 'constructor',
+  },
+  {
     anonymous: false,
     inputs: [
       {
@@ -38,10 +43,42 @@ export const solidGuardManagerABI = [
     type: 'event',
   },
   {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'address',
+        name: '_dApp',
+        type: 'address',
+      },
+    ],
+    name: 'Pause',
+    type: 'event',
+  },
+  {
     inputs: [
       {
         internalType: 'address[]',
-        name: '_dApps',
+        name: 'dApps',
+        type: 'address[]',
+      },
+    ],
+    name: 'batchGetPauses',
+    outputs: [
+      {
+        internalType: 'uint256[]',
+        name: '',
+        type: 'uint256[]',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address[]',
+        name: 'dApps',
         type: 'address[]',
       },
     ],
@@ -53,13 +90,32 @@ export const solidGuardManagerABI = [
   {
     inputs: [
       {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    name: 'dAppPauses',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
         internalType: 'address[]',
-        name: '_dApps',
+        name: 'dApps',
         type: 'address[]',
       },
       {
         internalType: 'uint256[]',
-        name: '_pauses',
+        name: 'pauses',
         type: 'uint256[]',
       },
     ],
@@ -72,7 +128,7 @@ export const solidGuardManagerABI = [
     inputs: [
       {
         internalType: 'address',
-        name: '_dApp',
+        name: 'dApp',
         type: 'address',
       },
     ],
@@ -89,31 +145,19 @@ export const solidGuardManagerABI = [
   },
   {
     inputs: [],
+    name: 'initialize',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
     name: 'owner',
     outputs: [
       {
         internalType: 'address',
         name: '',
         type: 'address',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-    ],
-    name: 'pauses',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
       },
     ],
     stateMutability: 'view',

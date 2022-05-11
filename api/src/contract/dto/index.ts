@@ -4,11 +4,9 @@ export class EtherscanContractsDto {
   contracts: ContractFromAPIDto[];
 }
 
-export class GithubContractInfoDto {
-  author: string;
-  repo: string;
-  path: string;
-  ref: string;
+export class EtherscanContractInfoDto {
+  addr: string;
+  names: string[];
 }
 
 export class ContractFromAPIDto {
@@ -18,9 +16,9 @@ export class ContractFromAPIDto {
 
 export class ContractDto {
   addr: string;
-  pause: boolean;
+  pauseable: boolean;
 }
 
 export class UpdateContractDto {
-  pause?: boolean;
+  pauseable?: boolean;
 }

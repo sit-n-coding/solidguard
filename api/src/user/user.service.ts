@@ -12,7 +12,7 @@ export class UserService {
   }
 
   async getUserByEmail(email: string): Promise<User> {
-    return await this.userDAO.getByEmail(email);
+    return await this.userDAO.getByName(email);
   }
 
   async createAccount(accountData: CreateAccountRequestDto): Promise<User> {
