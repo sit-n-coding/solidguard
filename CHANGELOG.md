@@ -2,10 +2,16 @@
   <p align="center">
     <img src="docs/img/solidguard-v1.png" width="200" alt="SolidGuard Logo" />
   </p>
-<h1>solidguard-api</h1>
 </div>
 
-# v1.0
+# v1.0.1
+
+**Date:** May 15, 2022
+
+**Security:**
+* Add SSL to the reverse proxy. SolidGuard should now be safe to deploy for production!
+
+# v1.0.0
 
 **Date:** May 10, 2022
 

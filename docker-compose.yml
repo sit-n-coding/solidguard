@@ -8,9 +8,24 @@ services:
       - api
       - client
     ports:
-      - "80:80"
+      - "443:443"
     volumes:
-      - ./nginx/:/etc/nginx/conf.d/:ro
+      - ./proxy/:/etc/nginx/conf.d/:ro
+      - ./proxy/certs/:/etc/nginx/certs/
+    networks:
+      - solidguard
+
+  client:
+    build:
+      context: client/
+      dockerfile: Dockerfile
+    hostname: client
+    depends_on:
+      - api
+    expose:
+      - "3000"
+    networks:
+      - solidguard
 
   api:
     build:
@@ -28,6 +43,8 @@ services:
       PORT: 3001
     expose:
       - "3001"
+    networks:
+      - solidguard
 
   postgres:
     image: postgres
@@ -42,18 +59,15 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - solidguard
 
   redis:
     image: redis
     ports:
       - "${REDIS_PORT}:${REDIS_PORT}"
+    networks:
+      - solidguard
 
-  client:
-    build:
-      context: client/
-      dockerfile: Dockerfile
-    hostname: client
-    depends_on:
-      - api
-    expose:
-      - "3000"
+networks:
+  solidguard:

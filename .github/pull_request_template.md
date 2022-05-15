@@ -1,4 +1,4 @@
-## [backend/feature] Pull Request Name
+## [team/feature] Pull Request Name
 
 -   [ ] Has the code been formatted?
 -   [ ] Have dependencies/packages been added?

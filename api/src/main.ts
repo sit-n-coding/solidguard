@@ -27,7 +27,7 @@ async function bootstrap() {
   const options = new DocumentBuilder()
     .setTitle('SolidGuard API')
     .setDescription("SolidGuard's API Server")
-    .setVersion('v1.0')
+    .setVersion('v1.0.1')
     .build();
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api', app, document);

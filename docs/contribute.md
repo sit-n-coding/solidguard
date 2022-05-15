@@ -2,8 +2,10 @@
   <p align="center">
     <img src="./img/solidguard-v1.png" width="200" alt="SolidGuard Logo"/>
   </p>
-<h1>Development Notes</h1>
+<h1>Contribution Notes</h1>
 </div>
+
+**Version:** `v1.0.1`
 
 ## Local Deployment
 For more information on how to deploy these services without Docker, see:
@@ -18,5 +20,3 @@ While the functionality of `v1.0` is done in the `api` and `blockchain`, some of
 * Passing in multiple contract names for creating an exploit.
 * Pagination in user subscriptions and attack library.
 * Missing search functionality in attack library.
-
-It is also known that SolidGuard is missing SSL, so before this can be deployed on a live server, SSL integration should first be implemented via the NGINX Proxy.
