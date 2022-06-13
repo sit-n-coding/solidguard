@@ -15,6 +15,7 @@ import Mexi from "../styles/members/mexi.png"
 import Angela from "../styles/members/angela.png"
 import Amy from "../styles/members/amy.jpg"
 import Leo from "../styles/members/leo.PNG"
+import Glenn from "../styles/members/glenn.webp"
 
 import Image from "next/image"
 import Box from '@mui/material/Box';
@@ -58,6 +59,7 @@ const members = [
     ["Ruo Ning (Nancy) Qiu", Nancy, "Backend Engineer", { linkedIn: "https://www.linkedin.com/in/nancy-ruoning-qiu" }],
     ["Vivek Kandathil", Vivek, "Frontend Engineer", { linkedIn: "https://www.linkedin.com/in/vivekkandathil/", website: "https://vivek.kandathil.ca/", github: "https://github.com/vivekandathil" }],
     ["Peter Pham", Peter, "Frontend Engineer", { linkedIn: "https://www.linkedin.com/in/peter-pham01/", github: "https://github.com/phampe68", website: "https://peter-pham.netlify.app/" }],
+    ["Glenn Ye", Glenn, "Frontend Engineer", { linkedIn: "https://www.linkedin.com/in/glenn-ye/", github: "https://github.com/LegoCityMan7063" }],
     ["Angela Shen", Angela, "Lead Designer", { linkedIn: "https://www.linkedin.com/in/angela-shen-428468204/" }],
     ["Amy Li", Amy, "Graphic Designer", {}],
     ["Jackie", Jackie, "Graphic Designer", { twitter: "https://twitter.com/jackyljs" }],

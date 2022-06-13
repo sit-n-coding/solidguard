@@ -5,7 +5,7 @@
 <h1>Setup for solidguard-api</h1>
 </div>
 
-**Version:** `v1.0.1`
+**Version:** `v1.0.2`
 
 ## Table of Contents
 - [Table of Contents](#table-of-contents)
@@ -39,19 +39,9 @@
   * `DEPLOY_PRIVATE_KEY` Private key used to deploy or has ownership of the SolidGuardManager contract.
   * `PROVIDER_URL` Blockchain provider URL to get information from the blockchain via the `ethers` library. You can use [Alchemy](https://www.alchemy.com/) or [Infura](https://infura.io/) here, just make sure the network it is providing is the same as the Etherscan API URL (i.e. must use a rinkeby provider url if using rinkeby.etherscan).
   * `SGM_ADDRESS` SolidGuardManager's **proxy** smart contract address on the specified blockchain. See [here](blockchain.md) on how to deploy the SolidGuardManager.
-* **Nodemailer** - Used to send emails/notifications to those subscribing their smart contracts.
-  * `TRANS_HOST` The host name for the email notification service. Should be "smtp.ethereal.email" by default
-  * `TRANS_PORT` The port number for email notification service. Should be 587 by default.
-  * `EMAIL_USER` The user name account for SolidGuard service. e.g. solidguard@gmail.com. It can be undefined if using a temporary test account.
-  * `EMAIL_PASSWORD` The actual password for the above email account. It can be undefined if using a temporary test account.
-  * `EMAIL_SERVICE` The service that used for the email account. e.g. 'gmail', 'hotmail'. It can be undefined if using a temporary test account.
-* **Web Security** - Used to secure the API.
-  * `CORS` Whether to enable CORS or not. This should be set to false if you're running it with docker-compose, as an nginx proxy is used to communicate between API and client.
-  * `SESSION_SECRET` Secret used to generate sessions. Time is in miliseconds.
-  * `SECURE` Cookie + Session flag on whether they should only be sent over HTTPS (use only in production!).
-  * `MAX_AGE` Maximum age of the cookie and session.
-  * `THROTTLER_TTL` Time to live for the given IP address. Time is in seconds.
-  * `THROTTLER_LIMIT` Limit on the # of requests an IP address can make within the TTL. Time is in seconds.
+* **SendGrid** - Used to send emails/notifications to those subscribing their smart contracts.
+  * `SENDGRID_API_KEY` Web API key to send emails on SendGrid.
+  * `SENDGRID_DOMAIN` Domain used for sending said emails.
 
 ## Local Setup
 
@@ -70,6 +60,11 @@ Once you have installed your databases, you will need to access PostgreSQL and r
 CREATE USER user SUPERUSER PASSWORD 'password';
 ```
 You can customize this command however you'd like, see [this link](https://www.postgresql.org/docs/8.0/sql-createuser.html) for more information.
+
+You will then need to create a database, and fill the name of the database in `POSTGRES_DB`. You can do it by running in psql:
+```
+createdb <POSTGRES_DB>
+```
 
 ### 2. Environment Variables Setup
 Fill in the following environment variables in a new file called `.env`. Examples of these variables can be seen in [`.env.example`](../.env.example), and information can be seen [here](#environment-variables).

@@ -61,7 +61,7 @@ const AttackCard = (props) => {
                             WebkitLineClamp: 3
                         }}
                     >
-                        {props.attack.description}
+                        {props.attack.description.replace("\\", "")}
                     </Typography>
                 </div>
                 <div className="AttackCardButtonContainer">

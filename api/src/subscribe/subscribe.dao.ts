@@ -44,4 +44,12 @@ export class SubscribeDAO {
       },
     });
   }
+
+  async getSubscribeCountByUser(userId: string): Promise<number> {
+    return this.prisma.subscribe.count({
+      where: {
+        userId: userId,
+      },
+    });
+  }
 }

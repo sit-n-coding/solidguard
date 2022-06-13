@@ -5,7 +5,7 @@ import { ContractModule } from './contract/contract.module';
 import { ExploitModule } from './exploit/exploit.module';
 import { SubscribeModule } from './subscribe/subscribe.module';
 import { BullModule } from '@nestjs/bull';
-import { EmailNotificationModule } from './email-notification/email-notification.module';
+import { EmailModule } from './email/email.module';
 import { UserModule } from './user/user.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { ThrottlerGuardBehindProxy } from './throttler/throttler.guard';
@@ -38,7 +38,7 @@ import { APP_GUARD } from '@nestjs/core';
     ContractModule,
     ExploitModule,
     SubscribeModule,
-    EmailNotificationModule,
+    EmailModule,
     UserModule,
   ],
   providers: [

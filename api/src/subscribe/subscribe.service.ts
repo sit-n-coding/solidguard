@@ -54,4 +54,8 @@ export class SubscribeService {
   ): Promise<SubscribeDto[]> {
     return await this.subscribeDAO.getSubscribeByUser(userId, page);
   }
+
+  async getSubscribeCountByUser(userId: string): Promise<number> {
+    return await this.subscribeDAO.getSubscribeCountByUser(userId);
+  }
 }

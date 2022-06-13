@@ -5,7 +5,7 @@
 <h1>Setup for solidguard-blockchain</h1>
 </div>
 
-**Version:** `v1.0.1`
+**Version:** `v1.0.2`
 
 ## Table of Contents
 - [Table of Contents](#table-of-contents)

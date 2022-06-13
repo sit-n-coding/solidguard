@@ -66,7 +66,7 @@ const NestedModal = (props) => {
     }
 
     const onVerify = async (e) => {
-        const response = await fetchAPI(`/exploit/verify/${props.exploitId}/`, {
+        const response = await fetchAPI(`/exploit/verify/${props.attack.id}/`, {
             method: "PATCH",
             headers: {
                 Accept: "application/json",
@@ -151,22 +151,28 @@ const NestedModal = (props) => {
                                 color={Colors["textDark"]}
                                 style={{ height: "80px", width: "90%", marginTop: "16px", marginBottom: "14px", overflow: "scroll" }}
                             >
-                                {props.attackList[index].description}
+                                {props.attackList[index].description.replace("\\", "")}
                             </Typography>
                         <Typography variant="h5">Smart Contract</Typography>
                         <div style={{ width: "90%", marginBottom: "20px" }}>
                             <hr />
                         </div>
-                        <Typography
-                                variant="body1"
+                        <div style={{ display: "flex", flexDirection: "row", height: "14px" }}>
+                            <Typography variant="body1" style={{ marginRight: "10px" }}><b>Contracts:</b></Typography>
+                            <Typography
+                                variant="body2"
+                                style={{ marginTop: "2px" }}
                                 color={Colors["textDark"]}
                             >
-                                <b>{props.attackList[index].targetNames.join(', ')}</b>
+                                {props.attackList[index].targetNames.join(', ')}
                             </Typography>
+                        </div>
                         <div style={{ display: "flex", flexDirection: "row", height: "45px" }}>
+                            <Typography variant="body1" style={{ marginTop: "8px", marginRight: "10px" }}><b>Address:</b></Typography>
                             <SyntaxHighlighter
                                 className="CodePreview"
                                 style={{ textColor: 'black' }}
+                                onClick={() => navigator.clipboard.writeText(props.attackList[index].targetAddr)}
                             >
                                 {props.attackList[index].targetAddr}
                             </SyntaxHighlighter>
@@ -179,12 +185,6 @@ const NestedModal = (props) => {
                             >
                                 <a href={etherscan} >Open in Etherscan</a>
                             </Button>
-                            <IconButton
-                                    component="span"
-                                    onClick={() => navigator.clipboard.writeText(props.attackList[index].targetAddr)}
-                            >
-                                <ContentCopyIcon />
-                            </IconButton>
                     </div>
                     <div>
                         <div style={{ display: "flex", flexDirection: "row", marginBottom: "100px", justifyContent: 'space-between' }}>

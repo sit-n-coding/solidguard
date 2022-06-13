@@ -4,12 +4,35 @@
   </p>
 </div>
 
+# v1.0.2
+
+**Date:** June 12, 2022
+
+**Features:**
+* Complete API and Client integration for all features, this includes:
+  * Adds missing pagination.
+  * Escaping of description.
+  * Search bar.
+  * Styling fixes.
+* Add monitoring tools such as:
+  * metabase
+  * portainer
+* Use SendGrid for sending emails instead of nodemailer.
+
+**Bug Fixes:**
+* Fix authentication issues when performing Admin actions (i.e. verifying an exploit).
+* Fix issue where the .env file in the client folder will be picked up in docker-compose.
+* Fix approving issues.
+
+**Security:**
+* Remove password from GET /api/user requests.
+
 # v1.0.1
 
 **Date:** May 15, 2022
 
 **Security:**
-* Add SSL to the reverse proxy. SolidGuard should now be safe to deploy for production!
+* Add SSL to the reverse proxy.
 
 # v1.0.0
 

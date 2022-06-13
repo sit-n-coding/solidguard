@@ -1,11 +1,11 @@
 <div align="center">
   <p align="center">
-    <img src="./docs/img/solidguard-v1.png" width="200" alt="SolidGuard Logo"/>
+    <img src="./img/solidguard-v1.png" width="200" alt="SolidGuard Logo"/>
   </p>
 <h1>SolidGuard Deployment</h1>
 </div>
 
-**Version**: `v1.0.1`
+**Version**: `v1.0.2`
 
 ## Table of Contents
 - [Table of Contents](#table-of-contents)
@@ -15,6 +15,8 @@
   - [2. Environment variables for the Web Application](#2-environment-variables-for-the-web-application)
   - [3. HTTPS Configuration](#3-https-configuration)
   - [4. Deploying via docker-compose](#4-deploying-via-docker-compose)
+    - [4.1 metabase](#41-metabase)
+    - [4.2 portainer-ce](#42-portainer-ce)
 
 ## Environment Variables
 * See [api environment variables](api.md#environment-variables).
@@ -34,6 +36,7 @@ Next, you will need to populate the `.env` file in the root folder of the solidg
  * `SECURE=true`
  * `POSTGRES_HOST=postgres`
  * `REDIS_HOST=redis`
+ * `METABASE_SECRET=<any string that is >= 16 chars>`
 
 **Note:** Make sure at this point that you don't have any `.env` files in the `client` or `api` folder, and only one `.env` file at the root directory!
 
@@ -49,3 +52,19 @@ All you need to do to deploy the web application is with the following command:
 ```bash
 docker-compose up --build
 ```
+#### 4.1 metabase
+
+You will need to set `METABASE_SECRET`, which is recommended to be the output of the following command:
+```
+openssl rand -base64 32
+```
+
+Once you are done that, you just need to access https://localhost/metabase/ and set up your account first before exposing it to the internet. When launching it for the first time, it is normal for it to take a long time to start.
+
+**Note:** It is normal if it takes a long time for Metabase to set up, and it may not seem that the /metabase/ webpage is not working. You may need to restart and monitor the logs to make sure it works.
+
+#### 4.2 portainer-ce
+
+Portainer Community Edition will be used to manage all containers used. Before you expose this application to the internet, you must first configure the admin user in https://localhost/portainer/. 
+
+**Note:** if you're running this entire applicaton locally, you will also see other images and volumes from other Docker projects you've used on this computer. This is normal since the app is looking through `/var/run/docker.sock` to retrieve information of your containers in Docker. This won't be the case when this application is hosted in its own virtual machine. Since this project will be hosted on one virtual machine, this is okay, but if we were to scale out the application so that all the containers can't be stored in one virtual machine, we'll need to use another service or look for SaaS for logging (i.e. Sentry, Kibana, Grafana).

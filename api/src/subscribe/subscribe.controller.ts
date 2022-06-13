@@ -20,7 +20,7 @@ import { ContractService } from '../contract/contract.service';
 import {
   CreateSubscribeRequestDto,
   CreateSubscribeResponseDto,
-  DashboardDto,
+  SubscriptionsResponseDto,
 } from './dto';
 import { SubscribeService } from './subscribe.service';
 
@@ -103,7 +103,7 @@ export class SubscribeController {
   @ApiOperation({ summary: 'Gets dashboard info by userId.' })
   @ApiCreatedResponse({
     description: 'Returns the user exploit.',
-    type: DashboardDto,
+    type: SubscriptionsResponseDto,
   })
   @ApiForbiddenResponse({
     description: "Signer's address does not match with the deployer's address.",
@@ -112,7 +112,7 @@ export class SubscribeController {
   public async getDashboardByUser(
     @UserId() userId: string,
     @Param('page') page: number
-  ): Promise<DashboardDto[]> {
+  ): Promise<SubscriptionsResponseDto> {
     const subscribes = await this.subscribeService.getSubscribeByUser(
       userId,
       page
@@ -126,10 +126,15 @@ export class SubscribeController {
         emailAddr: sub.emailAddr,
         contractAddr: sub.contractAddr,
         pausable: contract.pauseable,
-        createAt: sub.createdAt,
+        createdAt: sub.createdAt,
       };
       dslst.push(ds);
     }
-    return dslst;
+    const total = await this.subscribeService.getSubscribeCountByUser(userId);
+
+    return new SubscriptionsResponseDto({
+      subscriptions: dslst,
+      total,
+    });
   }
 }

@@ -1,7 +1,42 @@
 version: "3.8"
 services:
 
+  portainer:
+    container_name: solidguard_portainer
+    image: portainer/portainer-ce:2.0.0
+    command: -H unix:///var/run/docker.sock
+    restart: always
+    networks:
+      - solidguard
+    expose:
+      - "9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+
+  metabase:
+    container_name: solidguard_metabase
+    restart: "always"
+    image: metabase/metabase
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - JAVA_TIMEZONE=US/Eastern
+      - MB_ENCRYPTION_SECRET_KEY=${METABASE_SECRET}
+      - MB_DB_TYPE=postgres
+      - MB_DB_PASS=${POSTGRES_PASSWORD}
+      - MB_DB_USER=${POSTGRES_USER}
+      - MB_DB_HOST=${POSTGRES_HOST}
+      - MB_DB_PORT=${POSTGRES_PORT}
+      - MB_DB_DBNAME=${POSTGRES_DB}
+    expose:
+      - "3000"
+    networks:
+      - solidguard
+
   proxy:
+    container_name: solidguard_proxy
     image: nginx:1.21.6-alpine
     restart: always
     depends_on:
@@ -16,6 +51,7 @@ services:
       - solidguard
 
   client:
+    container_name: solidguard_client
     build:
       context: client/
       dockerfile: Dockerfile
@@ -28,6 +64,7 @@ services:
       - solidguard
 
   api:
+    container_name: solidguard_api
     build:
       context: ./api
       dockerfile: Dockerfile
@@ -47,6 +84,7 @@ services:
       - solidguard
 
   postgres:
+    container_name: solidguard_postgres
     image: postgres
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -55,19 +93,33 @@ services:
     ports:
       - "${POSTGRES_PORT}:${POSTGRES_PORT}"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U '${POSTGRES_USER}' -d '$POSTGRES_DB' -h '$POSTGRES_HOST'"]
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U '${POSTGRES_USER}' -d '$POSTGRES_DB' -h '$POSTGRES_HOST'"
+        ]
       interval: 5s
       timeout: 5s
       retries: 5
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - solidguard
 
   redis:
+    container_name: solidguard_redis
     image: redis
     ports:
       - "${REDIS_PORT}:${REDIS_PORT}"
+    volumes:
+      - redis_data:/data
     networks:
       - solidguard
 
 networks:
   solidguard:
+
+volumes:
+  portainer_data:
+  postgres_data:
+  redis_data:

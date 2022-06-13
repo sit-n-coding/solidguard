@@ -1,4 +1,5 @@
-import { Suspense } from 'react';
+import { Suspense } from "react"
+import * as React from "react"
 import theme from "../styles/themes.js"
 import { createTheme, ThemeProvider } from "@mui/material/styles"
 import Grid from "@mui/material/Grid"
@@ -13,6 +14,7 @@ import AttackCard from "../components/attackCard"
 import { useEffect, useState } from "react"
 import { responseSymbol } from "next/dist/server/web/spec-compliant/fetch-event"
 import { fetchAPI } from "../components/fetchAPI"
+import { AuthContext } from "../components/authContext"
 
 const Search = styled("div")(({ theme }) => ({
     position: "relative",
@@ -60,8 +62,8 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }))
 
 // ----- USE THIS WHEN BACKEND ISSUES :( ---------------
-let populateWithTestAttacks = false;
-let tempList = Array.from(Array(10), (_, x) => {
+let populateWithTestAttacks = false
+let tempList = Array.from(Array(40), (_, x) => {
     return {
         id: x,
         name: "#" + x.toString() + " Attack",
@@ -70,66 +72,78 @@ let tempList = Array.from(Array(10), (_, x) => {
             id: Math.random().toString(16),
             createdAt: "1/7/2022",
             name: "xyz",
-            role: "ADMIN",
+            role: "ADMIN"
         },
         authorUserId: Math.random().toString(16),
-        description: "According to all known laws of aviation, there is no way that a bee should be able to fly. Its wings are too small to get its fat little body off the ground. The bee, of course, flies anyway because bees don't care what humans think is impossible. Yellow, black. Yellow, black. Yellow, black. Yellow, black. Ooh, black and yellow! Yeah, let's shake it up",
-        targetNames: ["TimelockController"],
-        targetAddr: "0x51B9638447d87d69933C9888B36aDA95Ed7549c0",
-        verified: false,
+        description:
+            "According \n \"to\" % all known laws of aviation, there is no way that a bee should be able to fly. Its wings are too small to get its fat little body off the ground. The bee, of course, flies anyway because bees don't care what humans think is impossible. Yellow, black. Yellow, black. Yellow, black. Yellow, black. Ooh, black and yellow! Yeah, let's shake it up",
+        targetNames: [
+            "TimelockController",
+            "SolidGuard1",
+            "SolidGuard2",
+            "SolidGuard3",
+            "SolidGuard4"
+        ],
+        targetAddr: ["0x51B9638447d87d69933C9888B36aDA95Ed7549c0"],
+        verified: false
     }
 })
 // ------------------------------------------------------
 
 const AttackLibrary = (props) => {
-    const [search, setSearch] = useState("");
-    const [attacks, setAttacks] = useState([]);
-    const [isFetching, setIsFetching] = useState(false);
-    const [page, setPage] = useState(1);
+    const [search, setSearch] = useState("")
+    const [attacks, setAttacks] = useState([])
+    const [isFetching, setIsFetching] = useState(false)
+    const [page, setPage] = useState(1)
+    const [authState, updateAuthState] = React.useContext(AuthContext)
+    const userId = authState.userId
 
     const fetchAttacks = async () => {
         if (populateWithTestAttacks) {
-            setAttacks(tempList);
+            setAttacks(tempList)
         } else {
             setTimeout(async () => {
-                const result = await fetchAPI(`/exploit/search/${page}`
-                )
+                await fetchAPI(`/exploit/search/${page}`)
                     .then((res) => res.json())
                     .then((data) => {
-                        setPage(page + 1);
+                        setPage(page + 1)
                         setAttacks(() => {
-                            return [...attacks, ...data.data];
-                        });
+                            return [...attacks, ...data.data]
+                        })
                     })
-            }, 1000);
+                    .catch((error) => {
+                        return
+                    })
+            }, 1000)
         }
     }
 
     useEffect(() => {
         fetchAttacks()
-        console.log(attacks)
-        window.addEventListener('scroll', handleScroll);
+        window.addEventListener("scroll", handleScroll)
     }, [])
 
     useEffect(() => {
-        if (!isFetching) return;
-        fetchMoreAttacks();
-    }, [isFetching]);
+        if (!isFetching) return
+        fetchMoreAttacks()
+    }, [isFetching])
 
     const fetchMoreAttacks = () => {
-        fetchAttacks();
-        setIsFetching(false);
-    };
+        fetchAttacks()
+        setIsFetching(false)
+    }
 
     const handleScroll = () => {
         if (
-            Math.ceil(window.innerHeight + document.documentElement.scrollTop) !== document.documentElement.offsetHeight ||
+            Math.ceil(
+                window.innerHeight + document.documentElement.scrollTop
+            ) !== document.documentElement.offsetHeight ||
             isFetching
         )
-            return;
-        setIsFetching(true);
-        console.log(isFetching);
-    };
+            return
+        setIsFetching(true)
+        console.log(isFetching)
+    }
 
     return (
         <ThemeProvider theme={theme}>
@@ -197,10 +211,20 @@ const AttackLibrary = (props) => {
                             ... or contribute to our attack library by
                             submitting here!
                         </Typography>
-                        <Link href={"contribute"} passHref>
+                        <Link
+                            href={userId ? "/contribute" : "/signin"}
+                            passHref
+                        >
                             <Button
                                 className="ContributeButton"
                                 variant="contained"
+                                sx={{
+                                    backgroundColor: "black",
+                                    borderRadius: "40px",
+                                    height: "60px",
+                                    width: "200px",
+                                    marginBottom: "20px"
+                                }}
                             >
                                 <Typography
                                     variant="button"
@@ -222,9 +246,11 @@ const AttackLibrary = (props) => {
                     >
                         {attacks
                             .filter((attack) => {
-                                return attack.name
-                                    .toLowerCase()
-                                    .startsWith(search.toLowerCase())
+                                return (
+                                    attack.name
+                                        .toLowerCase()
+                                        .indexOf(search.toLowerCase()) !== -1
+                                )
                             })
                             .map((row, i) => (
                                 <Suspense fallback={tempList[0]} key={i}>
