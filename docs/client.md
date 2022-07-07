@@ -5,7 +5,7 @@
 <h1>Setup for solidguard-client</h1>
 </div>
 
-**Version:** `v1.0.2`
+**Version:** `v1.0.3`
 
 ## Table of Contents
 - [Table of Contents](#table-of-contents)

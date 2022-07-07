@@ -1,6 +1,5 @@
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { HttpAdapterHost, NestFactory, Reflector } from '@nestjs/core';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 import { PrismaClientExceptionFilter } from 'nestjs-prisma';
 import { AppModule } from './app.module';
@@ -20,18 +19,6 @@ async function bootstrap() {
   // Prisma Client Exception Filter for unhandled exceptions
   const { httpAdapter } = app.get(HttpAdapterHost);
   app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter));
-
-  // base path is now api
-  app.setGlobalPrefix('api');
-
-  // Swagger Api
-  const options = new DocumentBuilder()
-    .setTitle('SolidGuard API')
-    .setDescription("SolidGuard's API Server")
-    .setVersion('v1.0.2')
-    .build();
-  const document = SwaggerModule.createDocument(app, options);
-  SwaggerModule.setup('api', app, document);
 
   // Cors (only use when doing local dev work)
   if (process.env.CORS && process.env.CORS.toLowerCase() === 'true') {

@@ -5,18 +5,12 @@
 <h1>SolidGuard Deployment</h1>
 </div>
 
-**Version**: `v1.0.2`
+**Version**: `v1.0.3`
 
 ## Table of Contents
-- [Table of Contents](#table-of-contents)
-- [Environment Variables](#environment-variables)
-  - [0. Prerequisites](#0-prerequisites)
-  - [1. Deploying Smart Contracts.](#1-deploying-smart-contracts)
-  - [2. Environment variables for the Web Application](#2-environment-variables-for-the-web-application)
-  - [3. HTTPS Configuration](#3-https-configuration)
-  - [4. Deploying via docker-compose](#4-deploying-via-docker-compose)
-    - [4.1 metabase](#41-metabase)
-    - [4.2 portainer-ce](#42-portainer-ce)
+- [*Save* and the connected server should be created. The next time you visit the pgAdmin page, you should see the server already present.](#save-and-the-connected-server-should-be-created-the-next-time-you-visit-the-pgadmin-page-you-should-see-the-server-already-present)
+      - [4.1 metabase](#41-metabase)
+      - [4.2 portainer-ce](#42-portainer-ce)
 
 ## Environment Variables
 * See [api environment variables](api.md#environment-variables).
@@ -41,7 +35,7 @@ Next, you will need to populate the `.env` file in the root folder of the solidg
 **Note:** Make sure at this point that you don't have any `.env` files in the `client` or `api` folder, and only one `.env` file at the root directory!
 
 ### 3. HTTPS Configuration
-To ensure this is production ready. You will need the certificate and private key to enable HTTPS. Typically you'd want to generate these files with [certbot](https://certbot.eff.org/) or another certificate authority, but locally, you will need to run
+To ensure this is production ready. You will need the certificate and private key to enable HTTPS. Typically you'd want to generate these files with [certbot](https://certbot.eff.org/), see [here](ssl.md) on how to do this, but if you want to just test the app locally, you will need to run
 ```bash
 openssl req -x509 -nodes -newkey rsa:4096 -keyout solidguard.key -out solidguard.crt
 ```

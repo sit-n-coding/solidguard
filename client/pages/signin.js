@@ -49,17 +49,19 @@ const SignInField = (props) => {
 
 const SignInPage = () => {
     const signIn = async () => {
-
-        const response = await fetchAPI("/auth/login/", {
-            method: "POST",
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(signInBody)
+        console.log(signInBody)
+        const response = await fetchAPI(`
+        mutation login($input: LoginRequestDto!) {
+            login(loginRequest: $input)
+        }
+        `, {
+            input: {
+                name: signInBody['name'],
+                password: signInBody['password']
+            }
         })
 
-        if (response.status === 201) {
+        if (!response.errors) {
             alert("authorized")
         } else {
             alert("unauthorized")

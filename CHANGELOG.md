@@ -4,6 +4,14 @@
   </p>
 </div>
 
+# v1.0.3
+
+**Features:**
+* Switch from using REST APIs to GraphQL.
+
+**Security:**
+* Add manual SSL certificate generation scripts in /certbot/
+
 # v1.0.2
 
 **Date:** June 12, 2022

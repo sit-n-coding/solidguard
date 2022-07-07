@@ -1,4 +1,3 @@
-import { ApiProperty, ApiResponseProperty } from '@nestjs/swagger';
 import {
   IsArray,
   IsEmail,
@@ -6,6 +5,7 @@ import {
   IsNotEmpty,
   IsString,
 } from 'class-validator';
+import { Field, InputType, ObjectType } from '@nestjs/graphql';
 
 export class SubscribeDto {
   emailAddr: string;
@@ -20,72 +20,51 @@ export class CreateSubscribeDto {
   userId: string;
 }
 
+@InputType()
 export class CreateSubscribeRequestDto {
+  @Field(() => [String])
   @IsArray()
   @IsEmail({}, { each: true })
-  @ApiProperty({
-    uniqueItems: true,
-    example: ['admin@coolswap.com', 'mgmt@coolswap.com', 'jane.doe@gmail.com'],
-  })
   emailAddrs: string[];
+
+  @Field(() => [String])
   @IsArray()
   @IsEthereumAddress({ each: true })
-  @ApiProperty({
-    uniqueItems: true,
-    example: [
-      '0x664d600ea18FFf6Ec2bE5AA3682931245C683bfC',
-      '0x05BA813eA8d76b1553f68A1b5dC942e71846adD9',
-    ],
-  })
   contractAddrs: string[];
+
+  @Field()
   @IsString()
-  @ApiProperty({ example: '' })
   @IsNotEmpty() // O.K. since this does not go near the database.
   signedJSON: string;
 }
 
+@ObjectType()
 export class CreateSubscribeResponseDto {
-  @ApiResponseProperty({
-    example: ['admin@coolswap.com', 'mgmt@coolswap.com', 'jane.doe@gmail.com'],
-  })
+  @Field(() => [String])
   emailAddrs: string[];
-  @ApiResponseProperty({
-    example: [
-      '0x664d600ea18FFf6Ec2bE5AA3682931245C683bfC',
-      '0x05BA813eA8d76b1553f68A1b5dC942e71846adD9',
-    ],
-  })
+
+  @Field(() => [String])
   contractAddrs: string[];
 }
 
+@ObjectType()
 export class SubscriptionDto {
+  @Field()
   emailAddrs: string;
+  @Field()
   contractAddrs: string;
+  @Field()
   pauseable: boolean;
+  @Field()
   createdAt: Date;
 }
 
+@ObjectType()
 export class SubscriptionsResponseDto {
-  @ApiResponseProperty({
-    example: [
-      {
-        emailAddrs: 'niceman23@gmail.com',
-        contractAddrs: '0x664d600ea18FFf6Ec2bE5AA3682931245C683bfC',
-        pauseable: true,
-        createdAt: new Date(),
-      },
-      {
-        emailAddrs: 'meanman23@gmail.com',
-        contractAddrs: '0x05BA813eA8d76b1553f68A1b5dC942e71846adD9',
-        pauseable: false,
-        createdAt: new Date('December 17, 2021 03:24:00'),
-      },
-    ],
-  })
+  @Field(() => [SubscriptionDto])
   subscriptions: SubscriptionDto[];
-  @ApiResponseProperty({
-    example: 2,
-  })
+
+  @Field()
   total: number;
 
   constructor(response: SubscriptionsResponseDto) {

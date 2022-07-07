@@ -103,12 +103,31 @@ const AttackLibrary = (props) => {
             setAttacks(tempList)
         } else {
             setTimeout(async () => {
-                await fetchAPI(`/exploit/search/${page}`)
-                    .then((res) => res.json())
-                    .then((data) => {
+                await fetchAPI(
+                    `
+                    query searchExploitByName($pageNo: Float!, $input: SearchExploitsQueryDto!) {
+                        searchExploitByName(page: $pageNo, queryInfo: $input) {
+                          id
+                          name
+                          authorName
+                          description
+                          targetAddr
+                          targetNames
+                          verified
+                        }
+                      }                      
+                    `,
+                    {
+                        pageNo: page,
+                        input: {
+                            name: search
+                        }
+                    }
+                )
+                    .then(({ data }) => {
                         setPage(page + 1)
                         setAttacks(() => {
-                            return [...attacks, ...data.data]
+                            return [...attacks, ...data["searchExploitByName"]]
                         })
                     })
                     .catch((error) => {

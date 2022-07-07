@@ -66,14 +66,17 @@ const NestedModal = (props) => {
     }
 
     const onVerify = async (e) => {
-        const response = await fetchAPI(`/exploit/verify/${props.attack.id}/`, {
-            method: "PATCH",
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-            },
+        const response = await fetchAPI(`
+        mutation verifyExploit($input: ExploitIdParamDto!) {
+            verifyexploit(exploitId: $input)
+        }
+        `,
+        {
+            input: {
+                exploitId: props.attack.id,
+            }
         })
-        if (response.status === 200) {
+        if (!response.errors) {
             props.setStatus("Approved")
             props.setOpen(false)
             await props.fetchAttacks()

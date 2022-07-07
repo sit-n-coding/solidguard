@@ -6,70 +6,65 @@ import {
   IsString,
   Matches,
 } from 'class-validator';
-import { Exclude, Expose } from 'class-transformer';
-import { ApiProperty } from '@nestjs/swagger';
+import { Field, InputType, ObjectType } from '@nestjs/graphql';
 
 // source: https://ihateregex.io/expr/password/
 // 8-20 characters, at least one upper case English letter, one lower case English letter, one number and one special character.
 const passwordRegex =
   /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,20}$/;
 
+@InputType()
 export class CreateAccountRequestDto {
+  @Field()
   @IsAlphanumeric()
-  @ApiProperty({
-    example: 'bot',
-  })
   name: string;
+
+  @Field()
   @IsString()
   @Matches(passwordRegex)
-  @ApiProperty({
-    example: 'Hell0@W0rld!',
-  })
   password: string;
+
+  @Field()
   @IsEnum(Role)
-  @ApiProperty({ enum: Role })
   role: Role;
 }
 
+@InputType()
 export class RegisterUserRequestDto {
+  @Field()
   @IsAlphanumeric()
-  @ApiProperty({
-    example: 'bot',
-  })
   name: string;
+
+  @Field()
   @IsString()
   @Matches(passwordRegex)
-  @ApiProperty({
-    example: 'Hell0@W0rld!',
-  })
   password: string;
 }
 
-@Expose()
+@ObjectType()
 export class UserResponseDto {
-  @ApiProperty({ example: 'bfe1a66d-e923-425e-8f67-107e2dd93a3b' })
+  @Field()
   id: string;
-  @ApiProperty({ example: '2022-05-29T03:23:12.250Z' })
+
+  @Field()
   createdAt: Date;
-  @ApiProperty({ example: 'bot' })
+
+  @Field()
   name: string;
-  @ApiProperty({ example: 'USER' })
+
+  @Field()
   role: Role;
-  @Exclude()
-  password?: string;
 }
 
+@InputType()
 export class LoginRequestDto {
+  @Field()
   @IsAlphanumeric()
   @IsNotEmpty()
-  @ApiProperty({
-    example: 'bot',
-  })
   name: string;
+
+  @Field()
   @IsString()
   @IsNotEmpty()
-  @ApiProperty({
-    example: 'Hell0@W0rld!',
-  })
   password: string;
 }

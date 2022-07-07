@@ -50,22 +50,24 @@ const SignInPage = () => {
     const [password, setPassword] = useState("")
 
     const signIn = async () => {
-        console.log(registerBody)
-
-        const response = await fetchAPI("/user/register/", {
-            method: "POST",
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(registerBody)
+        const response = await fetchAPI(`
+        mutation registerUser($input: RegisterUserRequestDto!) {
+            registerUser(registerUserRequest: $input) {
+                id
+                name
+                role
+            }
+        }
+        `,
+        {
+            input: {
+                name: registerBody["name"],
+                password: registerBody["password"]
+            }
         })
 
-        if (response.status === 201) {
+        if (!response.errors) {
             alert("created")
-            response.json().then((data) => {
-                console.log(data)
-            })
         } else {
             alert("Error")
         }

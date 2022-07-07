@@ -179,20 +179,20 @@ const SecurityCheckPage = (props) => {
         }
         console.log(subscribeBody)
         console.log(JSON.stringify(subscribeBody))
-        const response = await fetchAPI("/subscribe/", {
-            method: "POST",
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(subscribeBody)
-        })
+        const response = await fetchAPI(`
+        mutation createSubscribe($input: CreateSubscribeRequestDto!) {
+            createSubscribe(createSubscribeRequest: $input) {
+                emailAddrs
+                contractAddrs
+            }
+        }
+        `, { input: {
+            emailAddrs: [emailAddr],
+            contractAddrs: [contractAddr],
+            signedJSON
+        } })
 
-        if (response.status === 201) {
-            response.json().then((data) => {
-                console.log(data)
-            })
-        } else {
+        if (!response.errors) {
             alert("Error")
         }
     }

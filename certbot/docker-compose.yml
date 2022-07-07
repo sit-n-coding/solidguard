@@ -1,0 +1,21 @@
+version: "3.8"
+services:
+  nginx:
+    image: nginx
+    container_name: certbot_nginx
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./data/conf:/etc/letsencrypt/live/solidguard.org
+      - ./data/www:/var/www/certbot
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    depends_on:
+      - nginx
+    volumes: 
+      - ./data/conf:/etc/letsencrypt
+      - ./data/www:/var/www/certbot
+    command: certonly --webroot -w /var/www/certbot --force-renewal --email ${DOMAIN_EMAIL} -d ${DOMAIN} --agree-tos

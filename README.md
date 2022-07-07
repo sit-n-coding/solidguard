@@ -5,7 +5,7 @@
 <h1>SolidGuard</h1>
 </div>
 
-**Version**: `v1.0.2`
+**Version**: `v1.0.3`
 
 SolidGuard is a Blockchain Security tool catered towards organizations who manages decentralized applications on the Ethereum blockchain. It is an attack database for documenting all major hacks that happened in the blockchain, and is also used to notify or pause decentralized applications that contain vulnerabilities published in the database.
 
@@ -21,6 +21,8 @@ This repository contains everything needed to run the server (minus the prerequi
 ## Deployment
 To learn more on deploying the entire application via docker-compose, see [deploy.md](./docs/deploy.md).
 
+To access our current deployment, see [https://solidguard.org/](https://solidguard.org/)!
+
 ## Contribute
 To learn more on how to contribute to this repository, see [contribute.md](./docs/contribute.md).
 
@@ -28,6 +30,6 @@ To learn more on how to contribute to this repository, see [contribute.md](./doc
 * **Lead Software Engineer:** Jan Garong.
 * **Lead Designer:** Angela Shen.
 * **Graphic Designers:** Amy Li, Jackie.
-* **Frontend Engineers:** Vivek Kandathil, Peter Pham.
+* **Frontend Engineers:** Vivek Kandathil, Peter Pham, Glenn Ye.
 * **Backend Engineers:** Meixuan (Mexi) Lu, Ruo Ning (Nancy) Qiu.
 * **DevOps Engineers:** Si (Leo) Wang, Stephen Guo.
