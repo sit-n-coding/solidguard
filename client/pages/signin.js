@@ -33,6 +33,7 @@ const SignInField = (props) => {
             <TextField
                 id="filled-basic"
                 variant="filled"
+                type={props.type}
                 style={{
                     margin: "10px 0 10% 0",
                     backgroundColor: Colors[5],
@@ -49,19 +50,17 @@ const SignInField = (props) => {
 
 const SignInPage = () => {
     const signIn = async () => {
-        console.log(signInBody)
-        const response = await fetchAPI(`
-        mutation login($input: LoginRequestDto!) {
-            login(loginRequest: $input)
-        }
-        `, {
-            input: {
-                name: signInBody['name'],
-                password: signInBody['password']
-            }
+
+        const response = await fetchAPI("/auth/login/", {
+            method: "POST",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(signInBody)
         })
 
-        if (!response.errors) {
+        if (response.status === 201) {
             alert("authorized")
         } else {
             alert("unauthorized")
@@ -115,7 +114,7 @@ const SignInPage = () => {
                         </Typography>
 
                         <SignInField field="Username" label="name" />
-                        <SignInField field="Password" label="password" />
+                        <SignInField field="Password" label="password" type="password" />
                         <Button
                             variant="contained"
                             onClick={() => signIn()}

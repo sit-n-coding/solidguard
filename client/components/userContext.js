@@ -13,7 +13,7 @@ export const UserProvider = ({ children }) => {
         const mmProvider = await getMetamaskProvider({ onAccountsChange: changeMMAddr });
         const web3Provider = new ethers.providers.Web3Provider(
             mmProvider,
-            ethers.providers.getNetwork("rinkeby"),
+            ethers.providers.getNetwork("goerli"),
         );
         setProviderState({ mmProvider, web3Provider })
     }, []);

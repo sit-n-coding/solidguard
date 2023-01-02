@@ -1,12 +1,13 @@
 import { Module } from '@nestjs/common';
+import { SubscribeController } from './subscribe.controller';
 import { SubscribeService } from './subscribe.service';
 import { SubscribeDAO } from './subscribe.dao';
 import { ContractModule } from '../contract/contract.module';
-import { SubscribeResolver } from './subscribe.resolver';
 
 @Module({
   imports: [ContractModule],
-  providers: [SubscribeService, SubscribeDAO, SubscribeResolver],
+  controllers: [SubscribeController],
+  providers: [SubscribeService, SubscribeDAO],
   exports: [SubscribeService],
 })
 export class SubscribeModule {}

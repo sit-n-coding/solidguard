@@ -174,6 +174,6 @@ export class ContractService {
   }
 
   private hasContract(sourceCode1: string, sourceCode2: string): boolean {
-    return sourceCode1.replace(/\s+/, '') === sourceCode2.replace(/\s+/, '');
+    return sourceCode1.trim() === sourceCode2.trim();
   }
 }

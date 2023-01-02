@@ -1,4 +1,19 @@
-import { ForbiddenException, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  ForbiddenException,
+  Post,
+  Get,
+  UseGuards,
+  Param,
+} from '@nestjs/common';
+import {
+  ApiCreatedResponse,
+  ApiForbiddenResponse,
+  ApiOperation,
+  ApiTags,
+  ApiParam,
+} from '@nestjs/swagger';
 import { SessionAuthGuard } from '../user/guard/session-auth.guard';
 import { UserId } from '../user/guard/user-id.decorator';
 import { ContractService } from '../contract/contract.service';
@@ -8,14 +23,53 @@ import {
   SubscriptionsResponseDto,
 } from './dto';
 import { SubscribeService } from './subscribe.service';
-import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 
-@Resolver()
-export class SubscribeResolver {
+@ApiTags('subscribe')
+@Controller('subscribe')
+export class SubscribeController {
   constructor(
     private readonly subscribeService: SubscribeService,
     private readonly contractService: ContractService
   ) {}
+
+  @Post()
+  @ApiOperation({
+    summary: 'Subscribes the given email addresses to each smart contract.',
+  })
+  @ApiCreatedResponse({
+    description: 'Returns the email and smart contract addresses.',
+    type: CreateSubscribeResponseDto,
+  })
+  @ApiForbiddenResponse({
+    description: "Signer's address does not match with the deployer's address.",
+  })
+  @UseGuards(SessionAuthGuard)
+  public async createSubscribe(
+    @UserId() userId: string,
+    @Body() bodyReq: CreateSubscribeRequestDto
+  ): Promise<CreateSubscribeResponseDto> {
+    // create message
+    const message = this.getMessage(bodyReq.contractAddrs, bodyReq.emailAddrs);
+
+    // check validity
+    const validityPromises: Promise<void>[] = [];
+    for (const addr of bodyReq.contractAddrs) {
+      validityPromises.push(
+        (async () => {
+          await this.verifyDev(addr, message, bodyReq.signedJSON);
+          await this.updateContractDB(addr);
+        })()
+      );
+    }
+    await Promise.all(validityPromises);
+
+    // create subscribe instances in db
+    return await this.subscribeService.createSubscribe({
+      contractAddrs: bodyReq.contractAddrs,
+      emailAddrs: bodyReq.emailAddrs,
+      userId,
+    });
+  }
 
   private getMessage(contractAddrs: string[], emailAddrs: string[]): string {
     return JSON.stringify({ contractAddrs, emailAddrs });
@@ -44,40 +98,20 @@ export class SubscribeResolver {
     }
   }
 
+  @Get('/:page')
+  @ApiParam({ name: 'page', type: Number })
+  @ApiOperation({ summary: 'Gets dashboard info by userId.' })
+  @ApiCreatedResponse({
+    description: 'Returns the user exploit.',
+    type: SubscriptionsResponseDto,
+  })
+  @ApiForbiddenResponse({
+    description: "Signer's address does not match with the deployer's address.",
+  })
   @UseGuards(SessionAuthGuard)
-  @Mutation(() => CreateSubscribeResponseDto)
-  async createSubscribe(
+  public async getDashboardByUser(
     @UserId() userId: string,
-    @Args('createSubscribeRequest') bodyReq: CreateSubscribeRequestDto
-  ): Promise<CreateSubscribeResponseDto> {
-    // create message
-    const message = this.getMessage(bodyReq.contractAddrs, bodyReq.emailAddrs);
-
-    // check validity
-    const validityPromises: Promise<void>[] = [];
-    for (const addr of bodyReq.contractAddrs) {
-      validityPromises.push(
-        (async () => {
-          await this.verifyDev(addr, message, bodyReq.signedJSON);
-          await this.updateContractDB(addr);
-        })()
-      );
-    }
-    await Promise.all(validityPromises);
-
-    // create subscribe instances in db
-    return await this.subscribeService.createSubscribe({
-      contractAddrs: bodyReq.contractAddrs,
-      emailAddrs: bodyReq.emailAddrs,
-      userId,
-    });
-  }
-
-  @UseGuards(SessionAuthGuard)
-  @Query(() => SubscriptionsResponseDto)
-  async getSubscriptions(
-    @UserId() userId: string,
-    @Args('page') page: number
+    @Param('page') page: number
   ): Promise<SubscriptionsResponseDto> {
     const subscribes = await this.subscribeService.getSubscribeByUser(
       userId,

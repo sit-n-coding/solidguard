@@ -10,9 +10,6 @@ import { UserModule } from './user/user.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { ThrottlerGuardBehindProxy } from './throttler/throttler.guard';
 import { APP_GUARD } from '@nestjs/core';
-import { GraphQLModule } from '@nestjs/graphql';
-import { join } from 'path';
-import { ApolloDriver } from '@nestjs/apollo';
 
 @Module({
   imports: [
@@ -29,20 +26,6 @@ import { ApolloDriver } from '@nestjs/apollo';
       }),
       imports: [ConfigModule],
       inject: [ConfigService],
-    }),
-    GraphQLModule.forRoot({
-      autoSchemaFile: join(__dirname, './src/schema.gql'),
-      sortSchema: true,
-      driver: ApolloDriver,
-      outputAs: 'class',
-      // cookies issue w gQL: https://github.com/nestjs/graphql/issues/119
-      context: ({ req, res }) => ({ req, res }),
-      // session issue w gQL: https://github.com/nestjs/graphql/issues/1121
-      playground: {
-        settings: {
-          'request.credentials': 'include',
-        },
-      },
     }),
     ThrottlerModule.forRootAsync({
       useFactory: async (conf: ConfigService) => ({

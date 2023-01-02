@@ -23,6 +23,8 @@ describe('ContractService', () => {
   let moduleRef: TestingModule;
   let configService: ConfigService;
   let sgmAddr: string;
+  const tt1 = '0x4Ec2f061b44fCCA27F2C780aFCDa6EF0FD3dDa2c';
+  const tt2 = '0xB871bBeC846c35fcA8bda76df8e529230888Dd02';
 
   const getModuleRefAndOverrideEtherscanDAO = (
     fcns: {
@@ -74,11 +76,7 @@ describe('ContractService', () => {
         configService
       );
       contractService = moduleRef.get<ContractService>(ContractService);
-      expect(
-        await contractService.verifyPauseableContract(
-          '0x05BA813eA8d76b1553f68A1b5dC942e71846adD9'
-        )
-      ).toBe(true);
+      expect(await contractService.verifyPauseableContract(tt1)).toBe(true);
     });
     it(`Apply check on contract that does not contain pauseable contract`, async () => {
       // override getSourceCode from etherscanDAO
@@ -116,11 +114,7 @@ describe('ContractService', () => {
       const signedMessage = await trueSigner.signMessage(message);
       // override getDeployerAddress from etherscanDAO
       expect(
-        await contractService.verifyDevOfContract(
-          '0x05BA813eA8d76b1553f68A1b5dC942e71846adD9',
-          message,
-          signedMessage
-        )
+        await contractService.verifyDevOfContract(tt1, message, signedMessage)
       ).toBe(true);
     });
     it(`Check if not signed by address of DEPLOY_PRIVATE_KEY`, async () => {
@@ -129,11 +123,7 @@ describe('ContractService', () => {
       const signedMessage = await randomWallet.signMessage(message);
       // override getDeployerAddress from etherscanDAO
       expect(
-        await contractService.verifyDevOfContract(
-          '0x05BA813eA8d76b1553f68A1b5dC942e71846adD9',
-          message,
-          signedMessage
-        )
+        await contractService.verifyDevOfContract(tt1, message, signedMessage)
       ).toBe(false);
     });
   });
@@ -156,7 +146,7 @@ describe('ContractService', () => {
         configService
       );
       contractService = moduleRef.get<ContractService>(ContractService);
-      const addr = '0x05BA813eA8d76b1553f68A1b5dC942e71846adD9';
+      const addr = tt1;
       await contractService.createContractDB(addr);
       const c = await contractService.getContractDB(addr);
       expect(c.addr).toBe(addr);
@@ -174,7 +164,7 @@ describe('ContractService', () => {
         configService
       );
       contractService = moduleRef.get<ContractService>(ContractService);
-      const addr = '0x05BA813eA8d76b1553f68A1b5dC942e71846adD9';
+      const addr = tt1;
       await contractService.createContractDB(addr);
       const c = await contractService.getContractDB(addr);
       expect(c.addr).toBe(addr);
@@ -200,19 +190,13 @@ describe('ContractService', () => {
       expect(addrs.length).toBe(0);
     });
     it(`Get 1 contract address`, async () => {
-      await contractService.createContractDB(
-        '0x05BA813eA8d76b1553f68A1b5dC942e71846adD9'
-      );
+      await contractService.createContractDB(tt1);
       const addrs = await contractService.getAllContractAddrs();
       expect(addrs.length).toBe(1);
     });
     it(`Get multiple contract addresses`, async () => {
-      await contractService.createContractDB(
-        '0x05BA813eA8d76b1553f68A1b5dC942e71846adD9'
-      );
-      await contractService.createContractDB(
-        '0xa2eDe474EcFaaF9CF2Da9b1Da65617D5966c3Ccb'
-      );
+      await contractService.createContractDB(tt1);
+      await contractService.createContractDB(tt2);
       const addrs = await contractService.getAllContractAddrs();
       expect(addrs.length).toBe(2);
     });
@@ -221,7 +205,7 @@ describe('ContractService', () => {
   describe('hasEtherscanContractsFromAddrs', () => {
     beforeEach(async () => {
       const getSourceCode = async (contractAddr: string) => {
-        if (contractAddr === '0xa2eDe474EcFaaF9CF2Da9b1Da65617D5966c3Ccb') {
+        if (contractAddr === tt2) {
           return {
             contracts: [
               {
@@ -231,9 +215,7 @@ describe('ContractService', () => {
               { name: 'TimelockController', content: timelockController },
             ],
           };
-        } else if (
-          contractAddr === '0x05BA813eA8d76b1553f68A1b5dC942e71846adD9'
-        ) {
+        } else if (contractAddr === tt1) {
           return {
             contracts: [
               {
@@ -247,9 +229,7 @@ describe('ContractService', () => {
               { name: 'TimelockController', content: timelockController },
             ],
           };
-        } else if (
-          contractAddr === '0x51B9638447d87d69933C9888B36aDA95Ed7549c0'
-        ) {
+        } else if (contractAddr === sgmAddr) {
           return {
             contracts: [
               { name: 'SolidGuardManager', content: solidGuardManager },
@@ -279,16 +259,11 @@ describe('ContractService', () => {
         await contractService.hasEtherscanContractsFromAddrs(
           {
             names: ['TimelockController'],
-            addr: '0x05BA813eA8d76b1553f68A1b5dC942e71846adD9',
+            addr: tt2,
           },
-          [
-            '0x05BA813eA8d76b1553f68A1b5dC942e71846adD9',
-            '0x51B9638447d87d69933C9888B36aDA95Ed7549c0',
-          ]
+          [tt1, sgmAddr]
         );
-      expect(affectedAddrs).toEqual(
-        expect.arrayContaining(['0x05BA813eA8d76b1553f68A1b5dC942e71846adD9'])
-      );
+      expect(affectedAddrs).toEqual(expect.arrayContaining([tt1]));
       expect(affectedAddrs.length).toBe(1);
     });
     it(`Contained in none`, async () => {
@@ -297,9 +272,9 @@ describe('ContractService', () => {
         await contractService.hasEtherscanContractsFromAddrs(
           {
             names: ['TimelockController'],
-            addr: '0x05BA813eA8d76b1553f68A1b5dC942e71846adD9',
+            addr: tt1,
           },
-          ['0x51B9638447d87d69933C9888B36aDA95Ed7549c0']
+          [sgmAddr]
         );
       expect(affectedAddrs).toEqual(expect.arrayContaining([]));
       expect(affectedAddrs.length).toBe(0);

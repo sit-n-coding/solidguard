@@ -84,8 +84,8 @@ jobs:
           POSTGRES_URL: postgresql://postgres:postgres@postgres:5432/
           PROVIDER_URL: ${{ secrets.TEST_PROVIDER_URL }}
           ETHERSCAN_API_KEY: ${{ secrets.TEST_ETHERSCAN_API_KEY }}
-          ETHERSCAN_URL: https://api-rinkeby.etherscan.io/
-          SGM_ADDRESS: '0x05BA813eA8d76b1553f68A1b5dC942e71846adD9'
+          ETHERSCAN_URL: https://api-goerli.etherscan.io/
+          SGM_ADDRESS: '0x2D09BA684813249A7ea06c7E445E3Eb3B50143B8'
           DEPLOY_PRIVATE_KEY: ${{ secrets.TEST_DEPLOY_PRIVATE_KEY }}
 
   TEST_BLOCKCHAIN:

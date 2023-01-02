@@ -32,7 +32,7 @@ services:
       ETHERSCAN_API_KEY:
       DEPLOY_PRIVATE_KEY:
       POSTGRES_URL: postgres://postgres:postgres@postgres:5432/
-      ETHERSCAN_URL: https://api-rinkeby.etherscan.io/
+      ETHERSCAN_URL: https://api-goerli.etherscan.io/
       SGM_ADDRESS: '0x05BA813eA8d76b1553f68A1b5dC942e71846adD9'
       JWT_ACCESS_SECRET: 'nestjsPrismaAccessSecret'
       JWT_EXPIRES_TIME: '60s'

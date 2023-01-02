@@ -68,9 +68,9 @@ let testUsername = "bot"
 //-----------------------------------
 
 const solidGuardManager = new ethers.Contract(
-    "0xC53Ec029Fa3B311971257d91c96Ab60EAc65Ae0b", // FIXME: Refactor into constants folder
+    "0x2D09BA684813249A7ea06c7E445E3Eb3B50143B8", // FIXME: Refactor into constants folder
     solidGuardManagerABI,
-    ethers.getDefaultProvider(ethers.providers.getNetwork("rinkeby")) // FIXME: Refactor into constants folder
+    ethers.getDefaultProvider(ethers.providers.getNetwork("goerli")) // FIXME: Refactor into constants folder
 )
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -170,17 +170,9 @@ const Dashboard = (props) => {
             return
         }
         try {
-            const res = await fetchAPI(`
-            query getProfile{
-                getProfile{
-                    name
-                    role
-                }
-            }
-            `, {})
-            if (!res.errors) {
-                setUsername(res["data"]["getProfile"]["username"])
-            }
+            const res = await fetchAPI("/user", { method: "GET" })
+            const data = await res.json()
+            setUsername(data.username)
         } catch (err) {
             console.error(err)
         }
@@ -189,22 +181,9 @@ const Dashboard = (props) => {
     const getDashboardInfo = async () => {
         try {
             // fetch sub information by API
-            const res = await fetchAPI(`
-            query getSubscriptions($input: Float!) {
-                getSubscriptions(page: $input) {
-                    subscriptions {
-                        emailAddrs
-                        contractAddrs
-                        pauseable
-                        createdAt
-                    }
-                    total
-                }
-            }
-            `, { input: page })
-            console.log(res)
-            const data = res.data["getSubscriptions"]
-            let newSubs = data["subscriptions"]
+            const res = await fetchAPI(`/subscribe/${page}`, { method: "GET" })
+            const data = await res.json()
+            let newSubs = data.subscriptions
             const subAddrs = newSubs.map(({ contractAddr }) => contractAddr)
 
             // save total number of subscriptions

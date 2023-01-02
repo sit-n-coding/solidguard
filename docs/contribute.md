@@ -5,7 +5,7 @@
 <h1>Contribution Notes</h1>
 </div>
 
-**Version:** `v1.0.3`
+**Version:** `v1.0.4`
 
 ## Local Deployment
 For more information on how to deploy these services without Docker, see:

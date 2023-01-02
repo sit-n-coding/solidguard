@@ -8,7 +8,7 @@ pragma solidity ^0.8.0;
 abstract contract SolidGuardPauseable {
 
     bool public sgPaused = false;
-    address constant solidGuardManager = 0xC53Ec029Fa3B311971257d91c96Ab60EAc65Ae0b;
+    address constant solidGuardManager = 0x2D09BA684813249A7ea06c7E445E3Eb3B50143B8;
     event SGPaused(bool _sgPaused);
 
     function isSGPaused() public view returns (bool) {

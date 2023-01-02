@@ -49,7 +49,7 @@ const statuses = {
 
 const NestedModal = (props) => {
     let verified = props.attackList[props.index].verified
-    let baseUrl = process.env.ETHERSCAN_URL != null ? process.env.ETHERSCAN_URL : 'https://rinkeby.etherscan.io/'
+    let baseUrl = process.env.ETHERSCAN_URL != null ? process.env.ETHERSCAN_URL : 'https://goerli.etherscan.io/'
     let etherscan = `${baseUrl}address/${props?.attackList[props.index]?.targetAddr}`
     const [index, setIndex] = useState(props.index)
 
@@ -66,17 +66,14 @@ const NestedModal = (props) => {
     }
 
     const onVerify = async (e) => {
-        const response = await fetchAPI(`
-        mutation verifyExploit($input: ExploitIdParamDto!) {
-            verifyexploit(exploitId: $input)
-        }
-        `,
-        {
-            input: {
-                exploitId: props.attack.id,
-            }
+        const response = await fetchAPI(`/exploit/verify?id=${props.attack.id}`, {
+            method: "PATCH",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+            },
         })
-        if (!response.errors) {
+        if (response.status === 200) {
             props.setStatus("Approved")
             props.setOpen(false)
             await props.fetchAttacks()

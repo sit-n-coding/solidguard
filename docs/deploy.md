@@ -5,7 +5,7 @@
 <h1>SolidGuard Deployment</h1>
 </div>
 
-**Version**: `v1.0.3`
+**Version**: `v1.0.4`
 
 ## Table of Contents
 - [*Save* and the connected server should be created. The next time you visit the pgAdmin page, you should see the server already present.](#save-and-the-connected-server-should-be-created-the-next-time-you-visit-the-pgadmin-page-you-should-see-the-server-already-present)

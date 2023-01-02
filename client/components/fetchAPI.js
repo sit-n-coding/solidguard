@@ -1,22 +1,14 @@
-export const fetchAPI = async (query, variables) => {
-    const params = {
-        method: "POST",
-        body: JSON.stringify({
-            query,
-            variables
-        }),
-        headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-        },
-        credentials: "include",
-    }
-    let res = null;
+export const fetchAPI = async (input, init) => {
     if (process.env.NEXT_PUBLIC_API_HOST){
-        res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/graphql`, params);
-    } else {
-        res = await fetch(`/graphql`, params);
+        return fetch(`${process.env.NEXT_PUBLIC_API_HOST}/api${input}`, {
+            ...(init ? init : {}),
+            headers: {
+                ...(init? init.headers : {}),
+            },
+            credentials: "include"
+        });
     }
-    const data = await res.json()
-    return data;
+    return fetch(`/api${input}`, {
+        ...init,
+    });
 }

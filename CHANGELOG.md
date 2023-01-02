@@ -4,7 +4,19 @@
   </p>
 </div>
 
+# v1.0.4
+
+**Date:** January 2, 2023
+
+**Features:**
+* Switch from rinkeby to goerli test network.
+* Add password hiding for Sign In.
+* Fix naive code comparison.
+* Reverted all updates from v1.0.3
+
 # v1.0.3
+
+**Date:** July 6, 2022
 
 **Features:**
 * Switch from using REST APIs to GraphQL.

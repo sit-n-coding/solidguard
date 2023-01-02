@@ -26,9 +26,9 @@ import {solidGuardManagerABI} from '../components/solidGuardManagerABI';
 let autocomplete = []
 let signature = ""
 const solidGuardManager = new ethers.Contract(
-    "0xC53Ec029Fa3B311971257d91c96Ab60EAc65Ae0b", // FIXME: Refactor into constants folder
+    "0x2D09BA684813249A7ea06c7E445E3Eb3B50143B8", // FIXME: Refactor into constants folder
     solidGuardManagerABI,
-    ethers.getDefaultProvider(ethers.providers.getNetwork("rinkeby")) // FIXME: Refactor into constants folder
+    ethers.getDefaultProvider(ethers.providers.getNetwork("goerli")) // FIXME: Refactor into constants folder
 )
 
 const PAUSE_ON_VULNERABILITY_RATE = 0.01
@@ -179,20 +179,20 @@ const SecurityCheckPage = (props) => {
         }
         console.log(subscribeBody)
         console.log(JSON.stringify(subscribeBody))
-        const response = await fetchAPI(`
-        mutation createSubscribe($input: CreateSubscribeRequestDto!) {
-            createSubscribe(createSubscribeRequest: $input) {
-                emailAddrs
-                contractAddrs
-            }
-        }
-        `, { input: {
-            emailAddrs: [emailAddr],
-            contractAddrs: [contractAddr],
-            signedJSON
-        } })
+        const response = await fetchAPI("/subscribe/", {
+            method: "POST",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(subscribeBody)
+        })
 
-        if (!response.errors) {
+        if (response.status === 201) {
+            response.json().then((data) => {
+                console.log(data)
+            })
+        } else {
             alert("Error")
         }
     }

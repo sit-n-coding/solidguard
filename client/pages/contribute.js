@@ -58,20 +58,20 @@ const ContributePage = (props) => {
     const uploadAttack = async () => {
         console.log(attackBody)
         setLoading(true)
-        const response = await fetchAPI(`
-        mutation createExploit($input: CreateExploitRequestDto!){
-            createExploit(createExploitRequest: $input) {
-                id
-                name
-            }
-        }
-        `, {
-            input: attackBody
+        const response = await fetchAPI("/exploit/", {
+            method: "POST",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(attackBody)
         })
         setLoading(false)
 
-        if (!response.errors) {
-            router.push("/attacklibrary")
+        if (response.status === 201) {
+            response.json().then((data) => {
+                router.push("/attacklibrary")
+            })
         } else {
             alert("Error")
         }

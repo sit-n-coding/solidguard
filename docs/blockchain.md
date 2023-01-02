@@ -5,7 +5,7 @@
 <h1>Setup for solidguard-blockchain</h1>
 </div>
 
-**Version:** `v1.0.3`
+**Version:** `v1.0.4`
 
 ## Table of Contents
 - [Table of Contents](#table-of-contents)
@@ -21,7 +21,7 @@
   * `ETHERSCAN_API_KEY` Etherscan API key. You will need to create an account to generate one. See [this](https://info.etherscan.com/api-keys/) for more information.
 * **Ethereum** - Blockchain used for SolidGuard. Note that the network referred must be consistent between Etherscan and all blockchain-related environment variables.
   * `DEPLOY_PRIVATE_KEY` Private key used to deploy the SolidGuardManager contract. Make sure it has enough Ether to deploy!
-  * `PROVIDER_URL` Blockchain provider URL to get information from the blockchain via the `ethers` library. You can use [Alchemy](https://www.alchemy.com/) or [Infura](https://infura.io/) here, just make sure the network it is providing is the same as the Etherscan API URL (i.e. must use a rinkeby provider url if using rinkeby.etherscan).
+  * `PROVIDER_URL` Blockchain provider URL to get information from the blockchain via the `ethers` library. You can use [Alchemy](https://www.alchemy.com/) or [Infura](https://infura.io/) here, just make sure the network it is providing is the same as the Etherscan API URL (i.e. must use a goerli provider url if using goerli.etherscan).
 
 ## Local Setup
 
