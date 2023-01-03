@@ -31,3 +31,8 @@ To learn more on how to contribute to this repository, see [contribute.md](./doc
 * **Frontend Engineers:** Vivek Kandathil, Peter Pham, Glenn Ye.
 * **Backend Engineers:** Meixuan (Mexi) Lu, Ruo Ning (Nancy) Qiu.
 * **DevOps Engineers:** Si (Leo) Wang, Stephen Guo.
+
+
+## Disclaimer
+This is a prototype meant for demoing and showing the concept of what SolidGuard could be. It should not be used in production since there are many bugs and security flaws present in the application.
+
